@@ -1,0 +1,4 @@
+# Hashes of file build rules.
+2bc1bd9a26bc6f1b8a95f1909babb065 Battle_Arena_autogen/timestamp
+f662f1cd63a58b90656fe2b976db4370 CMakeFiles/Battle_Arena_autogen
+f662f1cd63a58b90656fe2b976db4370 CMakeFiles/Battle_Arena_autogen_timestamp_deps

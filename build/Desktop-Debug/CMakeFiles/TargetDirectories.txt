@@ -1,0 +1,9 @@
+/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles/Battle_Arena.dir
+/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles/edit_cache.dir
+/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles/rebuild_cache.dir
+/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles/list_install_components.dir
+/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles/install.dir
+/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles/install/local.dir
+/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles/install/strip.dir
+/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles/Battle_Arena_autogen_timestamp_deps.dir
+/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles/Battle_Arena_autogen.dir

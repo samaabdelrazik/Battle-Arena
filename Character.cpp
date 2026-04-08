@@ -1,5 +1,7 @@
 #include "Character.h"
 #include <iostream>
+#include <QKeyEvent>
+
 using namespace std;
 
 int Character::characterCount = 0;
@@ -41,6 +43,9 @@ bool Character::isAlive() const{
     }
         else return false;
     }
+    else return false;
+}
+
 int Character::getCharacterCount(){
     return characterCount;
 }
@@ -48,3 +53,12 @@ int Character::getCharacterCount(){
 int Character::getSpecialAbilityUse() const{
     return specialAbilityUse;
 }
+
+void Character::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key()== Qt::Key_Left) moveBy(-10, 0);
+    if(event->key()== Qt::Key_Right) moveBy(10,0);
+    if(event->key()== Qt::Key_Up) moveBy(0, -10);
+    if(event->key()== Qt::Key_Down) moveBy(0, 10);
+}
+
