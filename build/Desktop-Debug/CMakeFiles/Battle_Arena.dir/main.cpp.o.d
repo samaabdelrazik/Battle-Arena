@@ -342,6 +342,8 @@ CMakeFiles/Battle_Arena.dir/main.cpp.o: /home/sama/Battle_Arena/main.cpp \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QGraphicsRectItem \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qgraphicsitem.h \
  /usr/include/x86_64-linux-gnu/qt6/QtGui/qpainterpath.h \
+ /home/sama/Battle_Arena/Archer.h /home/sama/Battle_Arena/Mage.h \
+ /home/sama/Battle_Arena/Warrior.h \
  /usr/include/x86_64-linux-gnu/qt6/QtGui/QBrush \
  /usr/include/x86_64-linux-gnu/qt6/QtGui/qbrush.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QGraphicsView \

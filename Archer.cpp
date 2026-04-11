@@ -1,18 +1,17 @@
 #include "Archer.h"
 #include <iostream>
+#include <QBrush>
 
 using namespace std;
 
 Archer::Archer(string name)
     : Character(name, 25, 100)
-{}
-
-int Archer::attack() const
 {
-    return getAttackDamage();
+    this->setBrush(Qt::blue);
 }
 
-int Archer::specialAbility() const
+
+int Archer::specialAbility()
 {
     cout << getName() << " uses Double Shot!\n";
     return getAttackDamage() * 2;

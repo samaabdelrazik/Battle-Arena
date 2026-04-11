@@ -24,7 +24,7 @@ public:
     void takeDamage(int damage);
     bool isAlive() const;
 
-    // virtual int specialAbility() = 0;
+    virtual int specialAbility() = 0;
     static int getCharacterCount();
     int getSpecialAbilityUse() const;
     void keyPressEvent(QKeyEvent *event);

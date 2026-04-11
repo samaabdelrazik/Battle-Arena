@@ -42,8 +42,6 @@ bool Character::isAlive() const{
         return true;
     }
         else return false;
-    }
-    else return false;
 }
 
 int Character::getCharacterCount(){

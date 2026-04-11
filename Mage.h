@@ -8,8 +8,7 @@ class Mage : public Character
 public:
     Mage(string name);
 
-    int attack() const override;
-    int specialAbility() const;
+    int specialAbility();
 };
 
 #endif

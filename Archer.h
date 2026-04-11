@@ -7,9 +7,7 @@ class Archer : public Character
 {
 public:
     Archer(string name);
-
-    int attack() const override;
-    int specialAbility() const;
+    int specialAbility()  override;
 };
 
 #endif

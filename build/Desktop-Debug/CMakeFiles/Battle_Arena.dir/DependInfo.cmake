@@ -9,8 +9,11 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "" "Battle_Arena_autogen/timestamp" "custom" "Battle_Arena_autogen/deps"
+  "/home/sama/Battle_Arena/Archer.cpp" "CMakeFiles/Battle_Arena.dir/Archer.cpp.o" "gcc" "CMakeFiles/Battle_Arena.dir/Archer.cpp.o.d"
   "/home/sama/Battle_Arena/build/Desktop-Debug/Battle_Arena_autogen/mocs_compilation.cpp" "CMakeFiles/Battle_Arena.dir/Battle_Arena_autogen/mocs_compilation.cpp.o" "gcc" "CMakeFiles/Battle_Arena.dir/Battle_Arena_autogen/mocs_compilation.cpp.o.d"
   "/home/sama/Battle_Arena/Character.cpp" "CMakeFiles/Battle_Arena.dir/Character.cpp.o" "gcc" "CMakeFiles/Battle_Arena.dir/Character.cpp.o.d"
+  "/home/sama/Battle_Arena/Mage.cpp" "CMakeFiles/Battle_Arena.dir/Mage.cpp.o" "gcc" "CMakeFiles/Battle_Arena.dir/Mage.cpp.o.d"
+  "/home/sama/Battle_Arena/Warrior.cpp" "CMakeFiles/Battle_Arena.dir/Warrior.cpp.o" "gcc" "CMakeFiles/Battle_Arena.dir/Warrior.cpp.o.d"
   "/home/sama/Battle_Arena/main.cpp" "CMakeFiles/Battle_Arena.dir/main.cpp.o" "gcc" "CMakeFiles/Battle_Arena.dir/main.cpp.o.d"
   )
 

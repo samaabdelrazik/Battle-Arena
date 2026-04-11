@@ -1,7 +1,13 @@
 Battle_Arena_autogen/timestamp: \
+	/home/sama/Battle_Arena/Archer.cpp \
+	/home/sama/Battle_Arena/Archer.h \
 	/home/sama/Battle_Arena/CMakeLists.txt \
 	/home/sama/Battle_Arena/Character.cpp \
 	/home/sama/Battle_Arena/Character.h \
+	/home/sama/Battle_Arena/Mage.cpp \
+	/home/sama/Battle_Arena/Mage.h \
+	/home/sama/Battle_Arena/Warrior.cpp \
+	/home/sama/Battle_Arena/Warrior.h \
 	/home/sama/Battle_Arena/build/Desktop-Debug/.qtc/package-manager/auto-setup.cmake \
 	/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles/3.28.3/CMakeCXXCompiler.cmake \
 	/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles/3.28.3/CMakeSystem.cmake \

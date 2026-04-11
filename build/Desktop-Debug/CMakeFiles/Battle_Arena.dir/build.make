@@ -118,11 +118,56 @@ CMakeFiles/Battle_Arena.dir/Character.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Battle_Arena.dir/Character.cpp.s"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/sama/Battle_Arena/Character.cpp -o CMakeFiles/Battle_Arena.dir/Character.cpp.s
 
+CMakeFiles/Battle_Arena.dir/Warrior.cpp.o: CMakeFiles/Battle_Arena.dir/flags.make
+CMakeFiles/Battle_Arena.dir/Warrior.cpp.o: /home/sama/Battle_Arena/Warrior.cpp
+CMakeFiles/Battle_Arena.dir/Warrior.cpp.o: CMakeFiles/Battle_Arena.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/Battle_Arena.dir/Warrior.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Battle_Arena.dir/Warrior.cpp.o -MF CMakeFiles/Battle_Arena.dir/Warrior.cpp.o.d -o CMakeFiles/Battle_Arena.dir/Warrior.cpp.o -c /home/sama/Battle_Arena/Warrior.cpp
+
+CMakeFiles/Battle_Arena.dir/Warrior.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Battle_Arena.dir/Warrior.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/sama/Battle_Arena/Warrior.cpp > CMakeFiles/Battle_Arena.dir/Warrior.cpp.i
+
+CMakeFiles/Battle_Arena.dir/Warrior.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Battle_Arena.dir/Warrior.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/sama/Battle_Arena/Warrior.cpp -o CMakeFiles/Battle_Arena.dir/Warrior.cpp.s
+
+CMakeFiles/Battle_Arena.dir/Mage.cpp.o: CMakeFiles/Battle_Arena.dir/flags.make
+CMakeFiles/Battle_Arena.dir/Mage.cpp.o: /home/sama/Battle_Arena/Mage.cpp
+CMakeFiles/Battle_Arena.dir/Mage.cpp.o: CMakeFiles/Battle_Arena.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/Battle_Arena.dir/Mage.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Battle_Arena.dir/Mage.cpp.o -MF CMakeFiles/Battle_Arena.dir/Mage.cpp.o.d -o CMakeFiles/Battle_Arena.dir/Mage.cpp.o -c /home/sama/Battle_Arena/Mage.cpp
+
+CMakeFiles/Battle_Arena.dir/Mage.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Battle_Arena.dir/Mage.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/sama/Battle_Arena/Mage.cpp > CMakeFiles/Battle_Arena.dir/Mage.cpp.i
+
+CMakeFiles/Battle_Arena.dir/Mage.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Battle_Arena.dir/Mage.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/sama/Battle_Arena/Mage.cpp -o CMakeFiles/Battle_Arena.dir/Mage.cpp.s
+
+CMakeFiles/Battle_Arena.dir/Archer.cpp.o: CMakeFiles/Battle_Arena.dir/flags.make
+CMakeFiles/Battle_Arena.dir/Archer.cpp.o: /home/sama/Battle_Arena/Archer.cpp
+CMakeFiles/Battle_Arena.dir/Archer.cpp.o: CMakeFiles/Battle_Arena.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/Battle_Arena.dir/Archer.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Battle_Arena.dir/Archer.cpp.o -MF CMakeFiles/Battle_Arena.dir/Archer.cpp.o.d -o CMakeFiles/Battle_Arena.dir/Archer.cpp.o -c /home/sama/Battle_Arena/Archer.cpp
+
+CMakeFiles/Battle_Arena.dir/Archer.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Battle_Arena.dir/Archer.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/sama/Battle_Arena/Archer.cpp > CMakeFiles/Battle_Arena.dir/Archer.cpp.i
+
+CMakeFiles/Battle_Arena.dir/Archer.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Battle_Arena.dir/Archer.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/sama/Battle_Arena/Archer.cpp -o CMakeFiles/Battle_Arena.dir/Archer.cpp.s
+
 # Object files for target Battle_Arena
 Battle_Arena_OBJECTS = \
 "CMakeFiles/Battle_Arena.dir/Battle_Arena_autogen/mocs_compilation.cpp.o" \
 "CMakeFiles/Battle_Arena.dir/main.cpp.o" \
-"CMakeFiles/Battle_Arena.dir/Character.cpp.o"
+"CMakeFiles/Battle_Arena.dir/Character.cpp.o" \
+"CMakeFiles/Battle_Arena.dir/Warrior.cpp.o" \
+"CMakeFiles/Battle_Arena.dir/Mage.cpp.o" \
+"CMakeFiles/Battle_Arena.dir/Archer.cpp.o"
 
 # External object files for target Battle_Arena
 Battle_Arena_EXTERNAL_OBJECTS =
@@ -130,6 +175,9 @@ Battle_Arena_EXTERNAL_OBJECTS =
 Battle_Arena: CMakeFiles/Battle_Arena.dir/Battle_Arena_autogen/mocs_compilation.cpp.o
 Battle_Arena: CMakeFiles/Battle_Arena.dir/main.cpp.o
 Battle_Arena: CMakeFiles/Battle_Arena.dir/Character.cpp.o
+Battle_Arena: CMakeFiles/Battle_Arena.dir/Warrior.cpp.o
+Battle_Arena: CMakeFiles/Battle_Arena.dir/Mage.cpp.o
+Battle_Arena: CMakeFiles/Battle_Arena.dir/Archer.cpp.o
 Battle_Arena: CMakeFiles/Battle_Arena.dir/build.make
 Battle_Arena: /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.4.2
 Battle_Arena: /usr/lib/x86_64-linux-gnu/libQt6Gui.so.6.4.2
@@ -137,7 +185,7 @@ Battle_Arena: /usr/lib/x86_64-linux-gnu/libQt6Core.so.6.4.2
 Battle_Arena: /usr/lib/x86_64-linux-gnu/libGLX.so
 Battle_Arena: /usr/lib/x86_64-linux-gnu/libOpenGL.so
 Battle_Arena: CMakeFiles/Battle_Arena.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable Battle_Arena"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/sama/Battle_Arena/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable Battle_Arena"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Battle_Arena.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

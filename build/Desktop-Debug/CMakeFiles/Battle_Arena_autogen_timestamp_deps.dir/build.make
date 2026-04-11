@@ -67,9 +67,9 @@ include CMakeFiles/Battle_Arena_autogen_timestamp_deps.dir/compiler_depend.make
 include CMakeFiles/Battle_Arena_autogen_timestamp_deps.dir/progress.make
 
 CMakeFiles/Battle_Arena_autogen_timestamp_deps: /usr/lib/x86_64-linux-gnu/libQt6Core.so.6.4.2
-CMakeFiles/Battle_Arena_autogen_timestamp_deps: /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.4.2
-CMakeFiles/Battle_Arena_autogen_timestamp_deps: /usr/lib/qt6/libexec/uic
 CMakeFiles/Battle_Arena_autogen_timestamp_deps: /usr/lib/qt6/libexec/moc
+CMakeFiles/Battle_Arena_autogen_timestamp_deps: /usr/lib/qt6/libexec/uic
+CMakeFiles/Battle_Arena_autogen_timestamp_deps: /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.4.2
 
 Battle_Arena_autogen_timestamp_deps: CMakeFiles/Battle_Arena_autogen_timestamp_deps
 Battle_Arena_autogen_timestamp_deps: CMakeFiles/Battle_Arena_autogen_timestamp_deps.dir/build.make
