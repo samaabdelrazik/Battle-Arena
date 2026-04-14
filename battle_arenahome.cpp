@@ -12,3 +12,15 @@ Battle_Arenahome::~Battle_Arenahome()
 {
     delete ui;
 }
+
+
+void Battle_Arenahome::on_startButton_clicked()
+{
+    emit startButtonClicked();
+}
+
+void Battle_Arenahome::on_exitButton_clicked()
+{
+    emit exitButtonClicked();
+}
+

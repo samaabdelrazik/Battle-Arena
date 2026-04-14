@@ -24,7 +24,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         Character.h Character.cpp Warrior.cpp Mage.cpp Archer.cpp Warrior.h Mage.h Archer.h
-        homepage.ui mainwindow.cpp
+        battle_arenahome.cpp battle_arenahome.h battle_arenahome.ui
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Battle_Arena APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

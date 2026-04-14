@@ -17,6 +17,13 @@ public:
     Battle_Arenahome(QWidget *parent = nullptr);
     ~Battle_Arenahome();
 
+private slots:
+    void on_startButton_clicked();
+    void on_exitButton_clicked();
+
+signals:
+    void startButtonClicked();
+    void exitButtonClicked();
 private:
     Ui::Battle_Arenahome *ui;
 };
