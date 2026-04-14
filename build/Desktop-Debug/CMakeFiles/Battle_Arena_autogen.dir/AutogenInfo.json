@@ -292,7 +292,8 @@
 		[ "/home/sama/Battle_Arena/Character.cpp", "MU", null ],
 		[ "/home/sama/Battle_Arena/Mage.cpp", "MU", null ],
 		[ "/home/sama/Battle_Arena/Warrior.cpp", "MU", null ],
-		[ "/home/sama/Battle_Arena/main.cpp", "MU", null ]
+		[ "/home/sama/Battle_Arena/main.cpp", "MU", null ],
+		[ "/home/sama/Battle_Arena/mainwindow.cpp", "MU", null ]
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],

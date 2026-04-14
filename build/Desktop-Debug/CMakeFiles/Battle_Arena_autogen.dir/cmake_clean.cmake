@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "Battle_Arena_autogen/include/ui_homepage.h"
   "Battle_Arena_autogen/mocs_compilation.cpp"
   "Battle_Arena_autogen/timestamp"
   "CMakeFiles/Battle_Arena_autogen"

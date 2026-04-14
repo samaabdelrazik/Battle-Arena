@@ -18,6 +18,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/Battle_Arena.dir/Warrior.cpp.o.d"
   "CMakeFiles/Battle_Arena.dir/main.cpp.o"
   "CMakeFiles/Battle_Arena.dir/main.cpp.o.d"
+  "CMakeFiles/Battle_Arena.dir/mainwindow.cpp.o"
+  "CMakeFiles/Battle_Arena.dir/mainwindow.cpp.o.d"
 )
 
 # Per-language clean rules from dependency scanning.

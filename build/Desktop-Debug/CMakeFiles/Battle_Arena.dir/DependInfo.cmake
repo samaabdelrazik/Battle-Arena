@@ -15,6 +15,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/sama/Battle_Arena/Mage.cpp" "CMakeFiles/Battle_Arena.dir/Mage.cpp.o" "gcc" "CMakeFiles/Battle_Arena.dir/Mage.cpp.o.d"
   "/home/sama/Battle_Arena/Warrior.cpp" "CMakeFiles/Battle_Arena.dir/Warrior.cpp.o" "gcc" "CMakeFiles/Battle_Arena.dir/Warrior.cpp.o.d"
   "/home/sama/Battle_Arena/main.cpp" "CMakeFiles/Battle_Arena.dir/main.cpp.o" "gcc" "CMakeFiles/Battle_Arena.dir/main.cpp.o.d"
+  "/home/sama/Battle_Arena/mainwindow.cpp" "CMakeFiles/Battle_Arena.dir/mainwindow.cpp.o" "gcc" "CMakeFiles/Battle_Arena.dir/mainwindow.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.
