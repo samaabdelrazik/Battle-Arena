@@ -24,19 +24,25 @@ Character::Character(string name, int attackDamage,int health){
 Character::~Character(){
     characterCount--;
 }
-int Character::attack() const{
+int Character::attack(){
+    damageDealt += attackDamage;
     return attackDamage;
 }
 void Character::takeDamage(int damage){
-    health = health - damage;
-    if (health >= 0){
+    health -= damage;
+
+    if (health > 0){
         cout << name << "'s Remaining health: " << health << endl;
     }
     else{
         health = 0;
         cout << name << "'s Remaining health: " << health << " ;character is dead" << endl;
+
+        emit characterDied(this);
     }
+
 }
+
 bool Character::isAlive() const{
     if(health > 0){
         return true;
@@ -50,6 +56,10 @@ int Character::getCharacterCount(){
 
 int Character::getSpecialAbilityUse() const{
     return specialAbilityUse;
+}
+
+int Character::calculateScore() const {
+    return damageDealt * 10;
 }
 
 void Character::keyPressEvent(QKeyEvent *event)
