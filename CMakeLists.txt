@@ -21,6 +21,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
 
+
         Character.h
         Character.cpp
 
@@ -48,6 +49,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         battle_arenahome.h
         battle_arenahome.cpp
         battle_arenahome.ui
+        
+        Enemy.h
+        Enemy.cpp
+
     )
 else()
     if(ANDROID)

@@ -73,3 +73,21 @@ CMakeLists.txt.user*
 *.exe
 
 build/
+# Build folders
+build/
+*.o
+*.obj
+*.exe
+
+# Qt / CMake
+CMakeFiles/
+CMakeCache.txt
+*.cmake
+
+# Qt Creator
+*.pro.user
+*.qtc*
+.qtc_clangd/
+
+# Ninja
+.ninja*

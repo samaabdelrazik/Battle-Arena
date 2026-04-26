@@ -12,6 +12,12 @@
 #include "GoodBlock.h"
 #include "BadBlock.h"
 #include "Platform.h"
+#include "Enemy.h"
+#include <QBrush>
+#include <QGraphicsView>
+#include <QMessageBox>
+#include <QTimer>
+
 
 int main(int argc, char *argv[])
 {
@@ -26,17 +32,9 @@ int main(int argc, char *argv[])
     archer->setRect(0, 0, 50, 50);
     archer->setPos(100, 100);
 
-    Mage *mage = new Mage("player2");
-    mage->setRect(0, 0, 50, 50);
-    mage->setPos(200, 100);
 
-    Warrior *warrior = new Warrior("player3");
-    warrior->setRect(0, 0, 50, 50);
-    warrior->setPos(300, 100);
-
+   
     scene->addItem(archer);
-    scene->addItem(mage);
-    scene->addItem(warrior);
 
 
     Platform *ground = new Platform(0, 650, 1000, 50);
@@ -68,12 +66,26 @@ int main(int argc, char *argv[])
     scene->addItem(bad2);
 
 
+    Enemy *enemy = new Enemy("enemy");
+    enemy->setRect(300,0,50,50);
+    enemy->setBrush(Qt::red);
+    scene->addItem(enemy);
+
+
     archer->setFlag(QGraphicsItem::ItemIsFocusable);
     archer->setFocus();
 
     QGraphicsView *view = new QGraphicsView(scene);
     view->setWindowTitle("Battle_Arena");
     view->resize(1020, 740);
+    Character* player = archer;
+
+    QObject::connect(player, &Character::characterDied, [&](Character* dead) {
+        int score = player->calculateScore();
+
+        QMessageBox::information(nullptr, "Game Over",
+                                 "You lost!\nScore: " + QString::number(score));
+    });
 
 
     QTimer *timer = new QTimer();
@@ -95,5 +107,12 @@ int main(int argc, char *argv[])
         w.close();
     });
 
+    QObject::connect(&w, &Battle_Arenahome::startButtonClicked, [&](){view->show(); w.close();});
+    QObject::connect(&w, &Battle_Arenahome::exitButtonClicked, [&](){w.close();});
+
+    QObject::connect(timer, &QTimer::timeout, [=]() {
+        enemy->updateLocation(*player);
+        enemy->attack(*player);
+    });
     return a.exec();
 }

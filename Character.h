@@ -7,14 +7,16 @@
 
 using namespace std;
 
-class Character : public QGraphicsRectItem
+class Character: public QObject, public QGraphicsRectItem
 {
+
+    Q_OBJECT
 private:
     string name;
     int health = 0;
     int attackDamage = 0;
     int specialAbilityUse = 1;
-    int score = 0;
+    int damageDealt;
     static int characterCount;
 
 
@@ -54,12 +56,14 @@ public:
     string getName() const;
     int getAttackDamage() const;
     int getHealth() const;
+
     int getScore() const;
     int getSpecialAbilityUse() const;
 
     virtual int attack() const;
     virtual int specialAbility() = 0;
-
+    
+    virtual ~Character();
     void takeDamage(int damage);
     bool isAlive() const;
 
@@ -74,6 +78,10 @@ public:
 
     static int getCharacterCount();
 
+    int calculateScore() const;
+    void keyPressEvent(QKeyEvent *event);
+
+
     void updateMovement();
     void jump();
 
@@ -83,6 +91,9 @@ public:
 
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
+
+    signals:
+    void characterDied(Character* deadCharacter);
 };
 
 #endif

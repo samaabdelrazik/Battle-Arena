@@ -53,38 +53,28 @@ int Character::getSpecialAbilityUse() const
 {
     return specialAbilityUse;
 }
-
-int Character::attack() const
-{
+int Character::attack(){
+    damageDealt += attackDamage;
     return attackDamage;
 }
-
-void Character::takeDamage(int damage)
-{
+void Character::takeDamage(int damage){
     health -= damage;
 
-    if (health < 0) {
+    if (health > 0){
+        cout << name << "'s Remaining health: " << health << endl;
+    }
+    else{
         health = 0;
+        cout << name << "'s Remaining health: " << health << " ;character is dead" << endl;
+
+        emit characterDied(this);
     }
 
-    cout << name << "'s remaining health: " << health << endl;
-
-    if (health == 0) {
-        cout << name << " is dead" << endl;
-    }
 }
 
-bool Character::isAlive() const
-{
-    return health > 0;
-}
-
-void Character::increaseHealth(int amount)
-{
-    health += amount;
-
-    if (health > 100) {
-        health = 100;
+bool Character::isAlive() const{
+    if(health > 0){
+        return true;
     }
 
     cout << name << " gained health. Current health: " << health << endl;
@@ -315,6 +305,10 @@ void Character::updateMovement()
             break;
         }
     }
+}
+
+int Character::calculateScore() const {
+    return damageDealt * 10;
 }
 
 void Character::keyPressEvent(QKeyEvent *event)
