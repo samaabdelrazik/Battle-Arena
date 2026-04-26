@@ -13,31 +13,52 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
-        main.cpp
-
-
-
+    main.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Battle_Arena
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        Character.h Character.cpp Warrior.cpp Mage.cpp Archer.cpp Warrior.h Mage.h Archer.h
-        battle_arenahome.cpp battle_arenahome.h battle_arenahome.ui
-        Enemy.h Enemy.cpp
+
+
+        Character.h
+        Character.cpp
+
+        Warrior.h
+        Warrior.cpp
+
+        Mage.h
+        Mage.cpp
+
+        Archer.h
+        Archer.cpp
+
+        Block.h
+        Block.cpp
+
+        GoodBlock.h
+        GoodBlock.cpp
+
+        BadBlock.h
+        BadBlock.cpp
+
+        Platform.h
+        Platform.cpp
+
+        battle_arenahome.h
+        battle_arenahome.cpp
+        battle_arenahome.ui
+        
+        Enemy.h
+        Enemy.cpp
+
     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET Battle_Arena APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
     if(ANDROID)
         add_library(Battle_Arena SHARED
             ${PROJECT_SOURCES}
         )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
         add_executable(Battle_Arena
             ${PROJECT_SOURCES}
@@ -47,12 +68,10 @@ endif()
 
 target_link_libraries(Battle_Arena PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
 if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Battle_Arena)
+    set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Battle_Arena)
 endif()
+
 set_target_properties(Battle_Arena PROPERTIES
     ${BUNDLE_ID_OPTION}
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
