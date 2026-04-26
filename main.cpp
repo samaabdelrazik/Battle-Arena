@@ -7,6 +7,8 @@
 #include "Warrior.h"
 #include <QBrush>
 #include <QGraphicsView>
+#include <QMessageBox>
+
 
 int main(int argc, char *argv[])
 {
@@ -37,6 +39,17 @@ int main(int argc, char *argv[])
 
     mage->setFlag(QGraphicsItem::ItemIsFocusable);
     mage->setFocus();
+
+    QVector<Character*> characters = {archer, mage, warrior};
+    Character* player = archer;
+
+    QObject::connect(player, &Character::characterDied, [&](Character* dead) {
+        int score = player->calculateScore();
+
+        QMessageBox::information(nullptr, "Game Over",
+                                 "You lost!\nScore: " + QString::number(score));
+    });
+
 
     QGraphicsView *view = new QGraphicsView(scene);
 
