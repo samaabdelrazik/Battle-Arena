@@ -5,9 +5,11 @@
 #include "Archer.h"
 #include "Mage.h"
 #include "Warrior.h"
+#include "Enemy.h"
 #include <QBrush>
 #include <QGraphicsView>
 #include <QMessageBox>
+#include <QTimer>
 
 
 int main(int argc, char *argv[])
@@ -22,25 +24,16 @@ int main(int argc, char *argv[])
     archer->setRect(0,0,50,50);
     archer->setBrush(Qt::blue);
 
-    Mage *mage = new Mage("player2");
-    mage->setRect(0, 60, 50, 50);
-
-    Warrior *warrior = new Warrior("player3");
-    warrior->setRect(0, 120, 50, 50);
+    Enemy *enemy = new Enemy("enemy");
+    enemy->setRect(300,0,50,50);
+    enemy->setBrush(Qt::red);
 
     scene->addItem(archer);
-    scene->addItem(warrior);
-    scene->addItem(mage);
+    scene->addItem(enemy);
+
     archer->setFlag(QGraphicsItem::ItemIsFocusable);
     archer->setFocus();
 
-    warrior->setFlag(QGraphicsItem::ItemIsFocusable);
-    warrior->setFocus();
-
-    mage->setFlag(QGraphicsItem::ItemIsFocusable);
-    mage->setFocus();
-
-    QVector<Character*> characters = {archer, mage, warrior};
     Character* player = archer;
 
     QObject::connect(player, &Character::characterDied, [&](Character* dead) {
@@ -56,5 +49,13 @@ int main(int argc, char *argv[])
     w.show();
     QObject::connect(&w, &Battle_Arenahome::startButtonClicked, [&](){view->show(); w.close();});
     QObject::connect(&w, &Battle_Arenahome::exitButtonClicked, [&](){w.close();});
+    QTimer *timer = new QTimer();
+
+    QObject::connect(timer, &QTimer::timeout, [=]() {
+        enemy->updateLocation(*player);
+        enemy->attack(*player);
+    });
+
+    timer->start(20);
     return a.exec();
 }
