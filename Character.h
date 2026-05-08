@@ -16,17 +16,15 @@ private:
     int health = 0;
     int attackDamage = 0;
     int specialAbilityUse = 1;
+    int score=0;
     int damageDealt;
     static int characterCount;
 
 
     double velocityX = 0.0;
-    double velocityY = 0.0;
-
-    double gravity = 0.6;
-    double fallGravity = 1.0;
+    
     double jumpStrength = -16.0;
-    double maxFallSpeed = 18.0;
+    
 
     double acceleration = 0.8;
     double friction = 0.75;
@@ -34,7 +32,7 @@ private:
 
     bool movingLeft = false;
     bool movingRight = false;
-    bool onGround = false;
+    
 
     int jumpCount = 0;
     int maxJumps = 1;
@@ -49,6 +47,14 @@ private:
     double baseMaxMoveSpeed = 6.5;
     int baseMaxJumps = 1;
 
+protected:
+    double velocityY = 0.0;
+
+    double gravity = 0.6;
+    double fallGravity = 1.0;
+    double maxFallSpeed = 18.0;
+    bool onGround = false;
+
 public:
     Character(string name, int attackDamage, int health);
     virtual ~Character();
@@ -60,10 +66,10 @@ public:
     int getScore() const;
     int getSpecialAbilityUse() const;
 
-    virtual int attack() const;
+    virtual int attack() ;
     virtual int specialAbility() = 0;
     
-    virtual ~Character();
+
     void takeDamage(int damage);
     bool isAlive() const;
 
@@ -79,7 +85,6 @@ public:
     static int getCharacterCount();
 
     int calculateScore() const;
-    void keyPressEvent(QKeyEvent *event);
 
 
     void updateMovement();

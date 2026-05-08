@@ -53,7 +53,7 @@ int Character::getSpecialAbilityUse() const
 {
     return specialAbilityUse;
 }
-int Character::attack(){
+int Character::attack()  {
     damageDealt += attackDamage;
     return attackDamage;
 }
@@ -76,6 +76,8 @@ bool Character::isAlive() const{
     if(health > 0){
         return true;
     }
+    else
+        return false;
 
     cout << name << " gained health. Current health: " << health << endl;
 }
@@ -332,4 +334,15 @@ void Character::keyReleaseEvent(QKeyEvent *event)
     else if (event->key() == Qt::Key_Right) {
         movingRight = false;
     }
+}
+
+void Character::increaseHealth(int amount)
+{
+    health += amount;
+
+    if (health > 100) {
+        health = 100;
+    }
+
+    cout << name << " gained health. Current health: " << health << endl;
 }

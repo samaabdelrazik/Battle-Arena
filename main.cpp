@@ -88,31 +88,19 @@ int main(int argc, char *argv[])
     });
 
 
-    QTimer *timer = new QTimer();
-    QObject::connect(timer, &QTimer::timeout, [=]() {
-        archer->updateMovement();
-        mage->updateMovement();
-        warrior->updateMovement();
-    });
-    timer->start(16);
+
 
     w.show();
 
-    QObject::connect(&w, &Battle_Arenahome::startButtonClicked, [&]() {
-        view->show();
-        w.close();
-    });
-
-    QObject::connect(&w, &Battle_Arenahome::exitButtonClicked, [&]() {
-        w.close();
-    });
 
     QObject::connect(&w, &Battle_Arenahome::startButtonClicked, [&](){view->show(); w.close();});
     QObject::connect(&w, &Battle_Arenahome::exitButtonClicked, [&](){w.close();});
 
+    QTimer *timer = new QTimer();
     QObject::connect(timer, &QTimer::timeout, [=]() {
+        archer->updateMovement();
         enemy->updateLocation(*player);
-        enemy->attack(*player);
     });
+    timer->start(16);
     return a.exec();
 }
