@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QTimer>
+#include <QProgressBar>
 
 #include "Character.h"
 #include "Archer.h"
@@ -80,6 +81,52 @@ int main(int argc, char *argv[])
     view->resize(1020, 740);
     Character* player = archer;
 
+    QProgressBar *healthBar = new QProgressBar(view);
+    QProgressBar *scoreBar = new QProgressBar(view);
+
+    healthBar->setGeometry(20, 20, 250, 30);
+    scoreBar->setGeometry(20, 60, 250, 30);
+
+    healthBar->setRange(0, 100);
+    healthBar->setValue(player->getHealth());
+
+    scoreBar->setRange(0, 500);
+    scoreBar->setValue(player->getScore());
+
+    healthBar->setFormat("Health: %v");
+    scoreBar->setFormat("Score: %v");
+
+    healthBar->setStyleSheet(
+        "QProgressBar {"
+        "border: 2px solid white;"
+        "border-radius: 5px;"
+        "text-align: center;"
+        "font-weight: bold;"
+        "background-color: black;"
+        "color: white;"
+        "}"
+        "QProgressBar::chunk {"
+        "background-color: red;"
+        "}"
+        );
+
+    scoreBar->setStyleSheet(
+        "QProgressBar {"
+        "border: 2px solid white;"
+        "border-radius: 5px;"
+        "text-align: center;"
+        "font-weight: bold;"
+        "background-color: black;"
+        "color: white;"
+        "}"
+        "QProgressBar::chunk {"
+        "background-color: green;"
+        "}"
+        );
+
+    healthBar->show();
+    scoreBar->show();
+
     QObject::connect(player, &Character::characterDied, [&](Character* dead) {
         int score = player->calculateScore();
 
@@ -97,10 +144,15 @@ int main(int argc, char *argv[])
     QObject::connect(&w, &Battle_Arenahome::exitButtonClicked, [&](){w.close();});
 
     QTimer *timer = new QTimer();
+
     QObject::connect(timer, &QTimer::timeout, [=]() {
         archer->updateMovement();
         enemy->updateLocation(*player);
+        healthBar->setValue(player->getHealth());
+
+        scoreBar->setValue(player->getScore());
     });
+
     timer->start(16);
     return a.exec();
 }
