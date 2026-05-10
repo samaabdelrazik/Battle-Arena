@@ -73,6 +73,7 @@ int main(int argc, char *argv[])
     scene->addItem(enemy);
 
 
+    scene->setBackgroundBrush(QBrush(QPixmap(":/images/forest.jpg").scaled(1000, 700, Qt::IgnoreAspectRatio, Qt::SmoothTransformation)));
     archer->setFlag(QGraphicsItem::ItemIsFocusable);
     archer->setFocus();
 
