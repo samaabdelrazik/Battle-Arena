@@ -7,7 +7,10 @@ class Warrior : public Character
 {
 public:
     Warrior(string name);
-    int specialAbility();
+
+    int specialAbility() override;
+
+    void basicAttack(QPointF targetPoint) override;
 };
 
 #endif

@@ -5,19 +5,29 @@
 #include <iostream>
 #include <QGraphicsScene>
 #include <QList>
+#include <QBrush>
+#include <QCoreApplication>
+#include <QDir>
+#include <QPen>
+#include <QFileInfo>
+#include <QStringList>
+#include <QTransform>
 #include <cmath>
 
 using namespace std;
 
 int Character::characterCount = 0;
 
-Character::Character(string name, int attackDamage, int health)
+Character::Character(string name,
+                     int attackDamage,
+                     int health)
 {
     this->name = name;
     this->attackDamage = attackDamage;
     this->health = health;
-    characterCount++;
+    this->maxHealth = health;
 
+    characterCount++;
 
     baseAcceleration = acceleration;
     baseMaxMoveSpeed = maxMoveSpeed;
@@ -49,37 +59,717 @@ int Character::getScore() const
     return score;
 }
 
-int Character::getSpecialAbilityUse() const
+double Character::getSpecialBar() const
 {
-    return specialAbilityUse;
+    return specialBar;
 }
-int Character::attack()  {
-    damageDealt += attackDamage;
-    return attackDamage;
+
+int Character::getAttackCooldownFrames() const
+{
+    return attackCooldownFrames;
 }
-void Character::takeDamage(int damage){
-    health -= damage;
 
-    if (health > 0){
-        cout << name << "'s Remaining health: " << health << endl;
-    }
-    else{
-        health = 0;
-        cout << name << "'s Remaining health: " << health << " ;character is dead" << endl;
-
-        emit characterDied(this);
+void Character::setAttackCooldownFrames(int frames)
+{
+    if (frames < 1)
+    {
+        frames = 1;
     }
 
+    attackCooldownFrames = frames;
 }
 
-bool Character::isAlive() const{
-    if(health > 0){
-        return true;
+void Character::setMovementStats(double newAcceleration,
+                                 double newMaxMoveSpeed)
+{
+    acceleration = newAcceleration;
+    maxMoveSpeed = newMaxMoveSpeed;
+
+    baseAcceleration = newAcceleration;
+    baseMaxMoveSpeed = newMaxMoveSpeed;
+}
+
+void Character::setSpriteSheet(const QString &spritePath,
+                               int columns,
+                               int rows)
+{
+    usingModernSpriteSheet = false;
+
+    spriteColumns = columns;
+    spriteRows = rows;
+
+    currentSpriteColumn = 1;
+    spriteAnimationCounter = 0;
+    walkSequenceIndex = 0;
+
+    facingDirection = FacingDirection::OutScreen;
+    pendingFacingDirection = FacingDirection::OutScreen;
+    facingLockCounter = 0;
+    directionTransitionCounter = 0;
+
+    spriteSheet.load(spritePath);
+
+    if (spriteSheet.isNull())
+    {
+        QString fileName = QFileInfo(spritePath).fileName();
+        QString relativePath =
+            "CharactersGraphics/rpgsprites1/" + fileName;
+
+        spriteSheet.load(relativePath);
+    }
+
+    if (spriteSheet.isNull())
+    {
+        QString fileName = QFileInfo(spritePath).fileName();
+        QString absolutePath =
+            "P:/CS2 project/Battle-Arena/CharactersGraphics/rpgsprites1/" + fileName;
+
+        spriteSheet.load(absolutePath);
+    }
+
+    if (!spriteItem)
+    {
+        spriteItem = new QGraphicsPixmapItem(this);
+    }
+
+    if (spriteSheet.isNull())
+    {
+        cout << "ERROR: Sprite failed to load: "
+             << spritePath.toStdString()
+             << endl;
+
+        setBrush(Qt::blue);
+        setPen(QPen(Qt::black));
+
+        return;
+    }
+
+    cout << "Sprite loaded successfully: "
+         << spritePath.toStdString()
+         << endl;
+
+    setBrush(Qt::NoBrush);
+    setPen(Qt::NoPen);
+
+    updateSpriteFrame();
+}
+
+void Character::setModernSpriteSheet(const QString &spritePath,
+                                     int frameWidth,
+                                     int frameHeight,
+                                     int firstRow,
+                                     int rowCount,
+                                     int idleRow,
+                                     int walkRow,
+                                     int attackRow,
+                                     int idleFrameCount,
+                                     int walkFrameCount,
+                                     int attackFrameCount)
+{
+    usingModernSpriteSheet = true;
+
+    modernFrameWidth = frameWidth;
+    modernFrameHeight = frameHeight;
+
+    modernFirstRow = firstRow;
+    modernRowCount = rowCount;
+
+    modernIdleRow = idleRow;
+    modernWalkRow = walkRow;
+    modernAttackRow = attackRow;
+
+    modernIdleFrameCount =
+        idleFrameCount > 0 ? idleFrameCount : 1;
+
+    modernWalkFrameCount =
+        walkFrameCount > 0 ? walkFrameCount : 1;
+
+    modernAttackFrameCount =
+        attackFrameCount > 0 ? attackFrameCount : 1;
+
+    modernCurrentFrame = 0;
+    modernAnimationCounter = 0;
+
+    modernAttackAnimationActive = false;
+    modernAttackFrame = 0;
+    modernAttackHoldCounter = 0;
+
+    QStringList possiblePaths;
+    QString appDir = QCoreApplication::applicationDirPath();
+    QString fileName = QFileInfo(spritePath).fileName();
+
+    possiblePaths << spritePath;
+
+    if (fileName == "ranger.png")
+    {
+        possiblePaths << "Effects/ranger spritesheet calciumtrice.png";
+        possiblePaths << appDir + "/../Effects/ranger spritesheet calciumtrice.png";
+        possiblePaths << appDir + "/../../Effects/ranger spritesheet calciumtrice.png";
+        possiblePaths << appDir + "/../../../Effects/ranger spritesheet calciumtrice.png";
+        possiblePaths << "P:/CS2 project/Battle-Arena/Effects/ranger spritesheet calciumtrice.png";
+    }
+    else if (fileName == "warrior.png")
+    {
+        possiblePaths << "Effects/warrior spritesheet calciumtrice.png";
+        possiblePaths << appDir + "/../Effects/warrior spritesheet calciumtrice.png";
+        possiblePaths << appDir + "/../../Effects/warrior spritesheet calciumtrice.png";
+        possiblePaths << appDir + "/../../../Effects/warrior spritesheet calciumtrice.png";
+        possiblePaths << "P:/CS2 project/Battle-Arena/Effects/warrior spritesheet calciumtrice.png";
+    }
+    else if (fileName == "wizard.png")
+    {
+        possiblePaths << "Effects/wizard spritesheet calciumtrice.png";
+        possiblePaths << appDir + "/../Effects/wizard spritesheet calciumtrice.png";
+        possiblePaths << appDir + "/../../Effects/wizard spritesheet calciumtrice.png";
+        possiblePaths << appDir + "/../../../Effects/wizard spritesheet calciumtrice.png";
+        possiblePaths << "P:/CS2 project/Battle-Arena/Effects/wizard spritesheet calciumtrice.png";
+    }
+    else if (fileName == "minotaur_earth.png")
+    {
+        possiblePaths << "Effects/minotaur_spritesheets/minotaurus_spritesheet_earth_original.png";
+        possiblePaths << appDir + "/../Effects/minotaur_spritesheets/minotaurus_spritesheet_earth_original.png";
+        possiblePaths << appDir + "/../../Effects/minotaur_spritesheets/minotaurus_spritesheet_earth_original.png";
+        possiblePaths << appDir + "/../../../Effects/minotaur_spritesheets/minotaurus_spritesheet_earth_original.png";
+        possiblePaths << "P:/CS2 project/Battle-Arena/Effects/minotaur_spritesheets/minotaurus_spritesheet_earth_original.png";
+    }
+
+    possiblePaths << "Effects/" + fileName;
+    possiblePaths << appDir + "/Effects/" + fileName;
+    possiblePaths << appDir + "/../Effects/" + fileName;
+    possiblePaths << appDir + "/../../Effects/" + fileName;
+    possiblePaths << appDir + "/../../../Effects/" + fileName;
+    possiblePaths << "P:/CS2 project/Battle-Arena/Effects/" + fileName;
+
+    QString loadedPath;
+
+    for (const QString &path : possiblePaths)
+    {
+        spriteSheet.load(QDir::cleanPath(path));
+
+        if (!spriteSheet.isNull())
+        {
+            loadedPath = path;
+            break;
+        }
+    }
+
+    if (!spriteItem)
+    {
+        spriteItem = new QGraphicsPixmapItem(this);
+    }
+
+    if (spriteSheet.isNull())
+    {
+        cout << "ERROR: Modern sprite failed to load: "
+             << spritePath.toStdString()
+             << endl;
+
+        setBrush(Qt::darkRed);
+        setPen(QPen(Qt::black));
+        return;
+    }
+
+    cout << "Modern sprite loaded successfully: "
+         << loadedPath.toStdString()
+         << endl;
+
+    setBrush(Qt::NoBrush);
+    setPen(Qt::NoPen);
+
+    updateModernSpriteFrame(modernIdleRow, 0);
+}
+
+void Character::playModernAttackAnimation(bool attackingRight)
+{
+    if (!usingModernSpriteSheet)
+    {
+        return;
+    }
+
+    modernFacingRight = attackingRight;
+
+    if (modernAttackAnimationActive)
+    {
+        if (modernAttackFrameDelay > modernAttackFastFrameDelay)
+        {
+            modernAttackFrameDelay--;
+        }
+
+        return;
+    }
+
+    modernAttackAnimationActive = true;
+    modernAttackFrame = 0;
+    modernAttackHoldCounter = 0;
+    modernAttackFrameDelay = modernAttackSlowFrameDelay;
+
+    updateModernSpriteFrame(modernAttackRow,
+                            modernAttackFrame);
+}
+
+void Character::setModernSpriteTargetSize(const QSize &size)
+{
+    if (!size.isValid() ||
+        size.width() <= 0 ||
+        size.height() <= 0)
+    {
+        return;
+    }
+
+    modernSpriteTargetSize = size;
+
+    if (usingModernSpriteSheet)
+    {
+        updateModernSpriteFrame(modernIdleRow,
+                                modernCurrentFrame);
+    }
+}
+
+void Character::setModernSpriteGroundOffset(double offset)
+{
+    modernSpriteGroundOffset = offset;
+
+    if (usingModernSpriteSheet)
+    {
+        updateModernSpriteFrame(modernIdleRow,
+                                modernCurrentFrame);
+    }
+}
+
+void Character::setAnimationMovementHint(bool moving,
+                                         bool facingRight)
+{
+    modernMovementHintActive = true;
+    modernMovementHintMoving = moving;
+    modernMovementHintFacingRight = facingRight;
+}
+
+void Character::clearAnimationMovementHint()
+{
+    modernMovementHintActive = false;
+}
+
+void Character::stepSpriteAnimation()
+{
+    updateSpriteAnimation();
+}
+
+int Character::rowForFacingDirection() const
+{
+    if (facingDirection == FacingDirection::InScreen)
+    {
+        return 0;
+    }
+
+    if (facingDirection == FacingDirection::Right)
+    {
+        return 1;
+    }
+
+    if (facingDirection == FacingDirection::Left)
+    {
+        return 3;
+    }
+
+    return 2;
+}
+
+void Character::setFacingFromTarget(QPointF targetPoint)
+{
+    double centerX =
+        x() + rect().width() / 2.0;
+
+    double centerY =
+        y() + rect().height() / 2.0;
+
+    double dx = targetPoint.x() - centerX;
+    double dy = targetPoint.y() - centerY;
+
+    double verticalThreshold = 25.0;
+
+    if (dy > verticalThreshold)
+    {
+        facingDirection = FacingDirection::OutScreen;
+    }
+    else if (dy < -verticalThreshold)
+    {
+        facingDirection = FacingDirection::InScreen;
     }
     else
-        return false;
+    {
+        if (dx >= 0)
+        {
+            facingDirection = FacingDirection::Right;
+            modernFacingRight = true;
+        }
+        else
+        {
+            facingDirection = FacingDirection::Left;
+            modernFacingRight = false;
+        }
+    }
 
-    cout << name << " gained health. Current health: " << health << endl;
+    pendingFacingDirection = facingDirection;
+    directionTransitionCounter = 0;
+    facingLockCounter = 18;
+
+    currentSpriteColumn = 1;
+    walkSequenceIndex = 0;
+
+    if (!usingModernSpriteSheet)
+    {
+        updateSpriteFrame();
+    }
+}
+
+void Character::updateFacingFromMovement()
+{
+    if (facingLockCounter > 0)
+    {
+        facingLockCounter--;
+        return;
+    }
+
+    if (directionTransitionCounter > 0)
+    {
+        directionTransitionCounter--;
+
+        if (directionTransitionCounter == 0)
+        {
+            facingDirection = pendingFacingDirection;
+        }
+
+        return;
+    }
+
+    bool wantsLeft =
+        velocityX < -0.3;
+
+    bool wantsRight =
+        velocityX > 0.3;
+
+    if (!wantsLeft && !wantsRight)
+    {
+        return;
+    }
+
+    FacingDirection wantedDirection =
+        wantsRight ? FacingDirection::Right : FacingDirection::Left;
+
+    modernFacingRight = wantsRight;
+
+    if (facingDirection == wantedDirection)
+    {
+        return;
+    }
+
+    bool changingBetweenLeftAndRight =
+        (facingDirection == FacingDirection::Left &&
+         wantedDirection == FacingDirection::Right) ||
+        (facingDirection == FacingDirection::Right &&
+         wantedDirection == FacingDirection::Left);
+
+    if (changingBetweenLeftAndRight)
+    {
+        facingDirection = FacingDirection::InScreen;
+        pendingFacingDirection = wantedDirection;
+        directionTransitionCounter = 5;
+    }
+    else
+    {
+        facingDirection = wantedDirection;
+        pendingFacingDirection = wantedDirection;
+        directionTransitionCounter = 0;
+    }
+}
+
+void Character::updateSpriteFrame()
+{
+    if (!spriteItem || spriteSheet.isNull())
+    {
+        return;
+    }
+
+    int frameWidth = spriteSheet.width() / spriteColumns;
+    int frameHeight = spriteSheet.height() / spriteRows;
+
+    int row = rowForFacingDirection();
+
+    QRect sourceRect(
+        currentSpriteColumn * frameWidth,
+        row * frameHeight,
+        frameWidth,
+        frameHeight
+    );
+
+    QPixmap frame =
+        spriteSheet.copy(sourceRect);
+
+    QPixmap scaledFrame =
+        frame.scaled(70,
+                     70,
+                     Qt::KeepAspectRatio,
+                     Qt::SmoothTransformation);
+
+    spriteItem->setPixmap(scaledFrame);
+
+    double spriteX =
+        (rect().width() - scaledFrame.width()) / 2.0;
+
+    double spriteY =
+        rect().height() -
+        scaledFrame.height() +
+        modernSpriteGroundOffset;
+
+    spriteItem->setPos(spriteX, spriteY);
+    spriteItem->setZValue(10);
+}
+
+void Character::updateModernSpriteFrame(int row,
+                                        int column)
+{
+    if (!spriteItem || spriteSheet.isNull())
+    {
+        return;
+    }
+
+    int realRow =
+        modernFirstRow + row;
+
+    if (realRow < modernFirstRow)
+    {
+        realRow = modernFirstRow;
+    }
+
+    if (realRow >= modernFirstRow + modernRowCount)
+    {
+        realRow = modernFirstRow + modernRowCount - 1;
+    }
+
+    QRect sourceRect(
+        column * modernFrameWidth,
+        realRow * modernFrameHeight,
+        modernFrameWidth,
+        modernFrameHeight
+    );
+
+    QPixmap frame =
+        spriteSheet.copy(sourceRect);
+
+    if (!modernFacingRight)
+    {
+        frame = frame.transformed(
+            QTransform().scale(-1, 1),
+            Qt::SmoothTransformation
+        );
+    }
+
+    QPixmap scaledFrame =
+        frame.scaled(modernSpriteTargetSize,
+                     Qt::KeepAspectRatio,
+                     Qt::SmoothTransformation);
+
+    spriteItem->setPixmap(scaledFrame);
+
+    double spriteX =
+        (rect().width() - scaledFrame.width()) / 2.0;
+
+    double spriteY =
+        rect().height() - scaledFrame.height();
+
+    spriteItem->setPos(spriteX, spriteY);
+    spriteItem->setZValue(10);
+}
+
+void Character::updateSpriteAnimation()
+{
+    if (!spriteItem || spriteSheet.isNull())
+    {
+        return;
+    }
+
+    if (usingModernSpriteSheet)
+    {
+        updateModernSpriteAnimation();
+        return;
+    }
+
+    updateFacingFromMovement();
+
+    bool isMoving =
+        std::abs(velocityX) > 0.3;
+
+    if (isMoving)
+    {
+        spriteAnimationCounter++;
+
+        if (spriteAnimationCounter >= 8)
+        {
+            int walkSequence[4] = {0, 1, 2, 1};
+
+            walkSequenceIndex++;
+
+            if (walkSequenceIndex >= 4)
+            {
+                walkSequenceIndex = 0;
+            }
+
+            currentSpriteColumn =
+                walkSequence[walkSequenceIndex];
+
+            spriteAnimationCounter = 0;
+        }
+    }
+    else
+    {
+        currentSpriteColumn = 1;
+        spriteAnimationCounter = 0;
+        walkSequenceIndex = 0;
+    }
+
+    updateSpriteFrame();
+}
+
+void Character::updateModernSpriteAnimation()
+{
+    if (modernMovementHintActive)
+    {
+        modernFacingRight = modernMovementHintFacingRight;
+    }
+    else
+    {
+        updateFacingFromMovement();
+    }
+
+    if (modernAttackAnimationActive)
+    {
+        modernAttackHoldCounter++;
+
+        if (modernAttackHoldCounter >= modernAttackFrameDelay)
+        {
+            modernAttackFrame++;
+            modernAttackHoldCounter = 0;
+        }
+
+        if (modernAttackFrame >= modernAttackFrameCount)
+        {
+            modernAttackAnimationActive = false;
+            modernAttackFrame = 0;
+            modernAttackHoldCounter = 0;
+        }
+        else
+        {
+            updateModernSpriteFrame(modernAttackRow,
+                                    modernAttackFrame);
+            return;
+        }
+    }
+
+    bool isMoving =
+        modernMovementHintActive
+            ? modernMovementHintMoving
+            : std::abs(velocityX) > 0.3;
+
+    if (isMoving)
+    {
+        if (modernCurrentFrame >= modernWalkFrameCount)
+        {
+            modernCurrentFrame = 0;
+        }
+
+        modernAnimationCounter++;
+
+        if (modernAnimationCounter >= 6)
+        {
+            modernCurrentFrame++;
+
+            if (modernCurrentFrame >= modernWalkFrameCount)
+            {
+                modernCurrentFrame = 0;
+            }
+
+            modernAnimationCounter = 0;
+        }
+
+        updateModernSpriteFrame(modernWalkRow,
+                                modernCurrentFrame);
+    }
+    else
+    {
+        if (modernCurrentFrame >= modernIdleFrameCount)
+        {
+            modernCurrentFrame = 0;
+        }
+
+        modernAnimationCounter++;
+
+        if (modernAnimationCounter >= 12)
+        {
+            modernCurrentFrame++;
+
+            if (modernCurrentFrame >= modernIdleFrameCount)
+            {
+                modernCurrentFrame = 0;
+            }
+
+            modernAnimationCounter = 0;
+        }
+
+        updateModernSpriteFrame(modernIdleRow,
+                                modernCurrentFrame);
+    }
+}
+
+int Character::attack()
+{
+    damageDealt += attackDamage;
+
+    return attackDamage;
+}
+
+void Character::takeDamage(int damage)
+{
+    if (!isAlive())
+    {
+        return;
+    }
+
+    health -= damage;
+
+    if (health > 0)
+    {
+        cout << name
+             << " remaining health: "
+             << health << endl;
+    }
+    else
+    {
+        health = 0;
+
+        cout << name
+             << " died" << endl;
+
+        if (!deathSignalEmitted)
+        {
+            deathSignalEmitted = true;
+            emit characterDied(this);
+        }
+    }
+}
+
+bool Character::isAlive() const
+{
+    return health > 0;
+}
+
+void Character::increaseHealth(int amount)
+{
+    health += amount;
+
+    if (health > maxHealth)
+    {
+        health = maxHealth;
+    }
 }
 
 void Character::decreaseHealth(int amount)
@@ -90,35 +780,60 @@ void Character::decreaseHealth(int amount)
 void Character::increaseScore(int amount)
 {
     score += amount;
-    cout << name << " gained score. Current score: " << score << endl;
 }
 
 void Character::decreaseScore(int amount)
 {
     score -= amount;
 
-    if (score < 0) {
+    if (score < 0)
+    {
         score = 0;
     }
-
-    cout << name << " lost score. Current score: " << score << endl;
 }
 
-void Character::increasePower(int amount)
+void Character::increaseSpecialBar(double amount)
 {
-    specialAbilityUse += amount;
-    cout << name << " power increased. Current power: " << specialAbilityUse << endl;
-}
+    specialBar += amount;
 
-void Character::decreasePower(int amount)
-{
-    specialAbilityUse -= amount;
-
-    if (specialAbilityUse < 0) {
-        specialAbilityUse = 0;
+    if (specialBar > 100.0)
+    {
+        specialBar = 100.0;
     }
+}
 
-    cout << name << " power decreased. Current power: " << specialAbilityUse << endl;
+void Character::decreaseSpecialBar(double amount)
+{
+    specialBar -= amount;
+
+    if (specialBar < 0.0)
+    {
+        specialBar = 0.0;
+    }
+}
+
+bool Character::canUseSpecial() const
+{
+    return specialBar >= 100.0;
+}
+
+bool Character::isSpecialActive() const
+{
+    return specialActive;
+}
+
+void Character::startSpecial()
+{
+    if (canUseSpecial())
+    {
+        specialActive = true;
+    }
+}
+
+void Character::stopSpecial()
+{
+    specialActive = false;
+    specialBar = 0.0;
 }
 
 int Character::getCharacterCount()
@@ -126,9 +841,15 @@ int Character::getCharacterCount()
     return characterCount;
 }
 
+int Character::calculateScore() const
+{
+    return damageDealt * 10 + score;
+}
+
 void Character::jump()
 {
-    if (jumpCount < maxJumps) {
+    if (jumpCount < maxJumps)
+    {
         velocityY = jumpStrength;
         onGround = false;
         jumpCount++;
@@ -137,26 +858,23 @@ void Character::jump()
 
 void Character::activateBonuses()
 {
-    if (!speedBoostActive) {
+    if (!speedBoostActive)
+    {
         speedBoostActive = true;
+
         acceleration = baseAcceleration + 0.4;
         maxMoveSpeed = baseMaxMoveSpeed + 2.0;
-        cout << name << " activated BonusSpeed!" << endl;
     }
 
-    if (!jumpBoostActive) {
+    if (!jumpBoostActive)
+    {
         jumpBoostActive = true;
         maxJumps = 2;
-        cout << name << " activated BonusJump!" << endl;
     }
 }
 
 void Character::deactivateBonuses()
 {
-    if (speedBoostActive || jumpBoostActive) {
-        cout << name << "'s bonuses were removed." << endl;
-    }
-
     speedBoostActive = false;
     jumpBoostActive = false;
 
@@ -164,7 +882,8 @@ void Character::deactivateBonuses()
     maxMoveSpeed = baseMaxMoveSpeed;
     maxJumps = baseMaxJumps;
 
-    if (jumpCount > maxJumps) {
+    if (jumpCount > maxJumps)
+    {
         jumpCount = maxJumps;
     }
 }
@@ -172,60 +891,144 @@ void Character::deactivateBonuses()
 void Character::registerHit(int damage)
 {
     takeDamage(damage);
+
     timeSinceLastHit = 0.0;
+
+    decreaseSpecialBar(5.0);
+
     deactivateBonuses();
+}
+
+void Character::resetForLevel()
+{
+    health = maxHealth;
+
+    score = 0;
+    damageDealt = 0;
+
+    specialBar = 0.0;
+    specialActive = false;
+
+    deathSignalEmitted = false;
+
+    velocityX = 0.0;
+    velocityY = 0.0;
+
+    movingLeft = false;
+    movingRight = false;
+
+    jumpCount = 0;
+
+    timeSinceLastHit = 0.0;
+
+    currentSpriteColumn = 1;
+    spriteAnimationCounter = 0;
+    walkSequenceIndex = 0;
+
+    modernCurrentFrame = 0;
+    modernAnimationCounter = 0;
+    modernAttackAnimationActive = false;
+    modernAttackFrame = 0;
+    modernAttackHoldCounter = 0;
+    modernAttackFrameDelay = modernAttackSlowFrameDelay;
+    modernFacingRight = true;
+    modernSpriteGroundOffset = 0.0;
+    modernMovementHintActive = false;
+    modernMovementHintMoving = false;
+    modernMovementHintFacingRight = true;
+
+    facingDirection = FacingDirection::OutScreen;
+    pendingFacingDirection = FacingDirection::OutScreen;
+    facingLockCounter = 0;
+    directionTransitionCounter = 0;
+
+    deactivateBonuses();
+
+    if (usingModernSpriteSheet)
+    {
+        updateModernSpriteFrame(modernIdleRow, 0);
+    }
+    else
+    {
+        updateSpriteFrame();
+    }
 }
 
 void Character::updateMovement()
 {
+    if (!isAlive())
+    {
+        return;
+    }
+
+    increaseSpecialBar(0.08);
 
     timeSinceLastHit += 0.016;
 
-    if (timeSinceLastHit >= 5.0) {
+    if (timeSinceLastHit >= 5.0)
+    {
         activateBonuses();
     }
 
-
-    if (movingLeft) {
+    if (movingLeft)
+    {
         velocityX -= acceleration;
     }
-    if (movingRight) {
+
+    if (movingRight)
+    {
         velocityX += acceleration;
     }
 
-
-    if (!movingLeft && !movingRight) {
+    if (!movingLeft && !movingRight)
+    {
         velocityX *= friction;
 
-        if (abs(velocityX) < 0.2) {
+        if (abs(velocityX) < 0.2)
+        {
             velocityX = 0;
         }
     }
 
-
-    if (velocityX > maxMoveSpeed) {
+    if (velocityX > maxMoveSpeed)
+    {
         velocityX = maxMoveSpeed;
     }
-    if (velocityX < -maxMoveSpeed) {
+
+    if (velocityX < -maxMoveSpeed)
+    {
         velocityX = -maxMoveSpeed;
     }
 
-
-    if (velocityX != 0) {
+    if (velocityX != 0)
+    {
         moveBy(velocityX, 0);
 
-        QList<QGraphicsItem*> horizontalCollisions = collidingItems();
-        for (QGraphicsItem *item : horizontalCollisions) {
-            Platform *platform = dynamic_cast<Platform*>(item);
-            if (platform) {
-                QRectF charRect = sceneBoundingRect();
-                QRectF platformRect = platform->sceneBoundingRect();
+        QList<QGraphicsItem*> horizontalCollisions =
+            collidingItems();
+
+        for (QGraphicsItem *item :
+             horizontalCollisions)
+        {
+            Platform *platform =
+                dynamic_cast<Platform*>(item);
+
+            if (platform)
+            {
+                QRectF charRect =
+                    sceneBoundingRect();
+
+                QRectF platformRect =
+                    platform->sceneBoundingRect();
 
                 bool standingOnTop =
-                    charRect.bottom() <= platformRect.top() + 5 &&
-                    charRect.bottom() >= platformRect.top() - 5;
+                    charRect.bottom()
+                        <= platformRect.top() + 5 &&
+                    charRect.bottom()
+                        >= platformRect.top() - 5;
 
-                if (!standingOnTop) {
+                if (!standingOnTop)
+                {
                     moveBy(-velocityX, 0);
                     velocityX = 0;
                     break;
@@ -234,72 +1037,93 @@ void Character::updateMovement()
         }
     }
 
-
-    if (velocityY < 0) {
+    if (velocityY < 0)
+    {
         velocityY += gravity;
-    } else {
+    }
+    else
+    {
         velocityY += fallGravity;
     }
 
-    if (velocityY > maxFallSpeed) {
+    if (velocityY > maxFallSpeed)
+    {
         velocityY = maxFallSpeed;
     }
 
-
     moveBy(0, velocityY);
+
     onGround = false;
 
-    QList<QGraphicsItem*> verticalCollisions = collidingItems();
-    for (QGraphicsItem *item : verticalCollisions) {
-        Platform *platform = dynamic_cast<Platform*>(item);
-        if (platform) {
-            QRectF charRect = sceneBoundingRect();
-            QRectF platformRect = platform->sceneBoundingRect();
+    QList<QGraphicsItem*> verticalCollisions =
+        collidingItems();
 
+    for (QGraphicsItem *item :
+         verticalCollisions)
+    {
+        Platform *platform =
+            dynamic_cast<Platform*>(item);
+
+        if (platform)
+        {
+            QRectF charRect =
+                sceneBoundingRect();
+
+            QRectF platformRect =
+                platform->sceneBoundingRect();
 
             if (velocityY >= 0 &&
-                charRect.bottom() >= platformRect.top() &&
-                charRect.bottom() - velocityY <= platformRect.top() + 5) {
+                charRect.bottom()
+                    >= platformRect.top() &&
+                charRect.bottom() - velocityY
+                    <= platformRect.top() + 5)
+            {
+                setY(platformRect.top()
+                     - rect().height());
 
-                setY(platformRect.top() - rect().height());
                 velocityY = 0;
                 onGround = true;
                 jumpCount = 0;
             }
-
-            else if (velocityY < 0 &&
-                     charRect.top() <= platformRect.bottom() &&
-                     charRect.top() - velocityY >= platformRect.bottom() - 5) {
-
-                setY(platformRect.bottom());
-                velocityY = 0;
-            }
         }
     }
 
+    if (scene())
+    {
+        QRectF sceneRect =
+            scene()->sceneRect();
 
-    if (scene()) {
-        QRectF sceneRect = scene()->sceneRect();
-
-        if (x() < sceneRect.left()) {
+        if (x() < sceneRect.left())
+        {
             setX(sceneRect.left());
             velocityX = 0;
         }
 
-        if (x() + rect().width() > sceneRect.right()) {
-            setX(sceneRect.right() - rect().width());
+        if (x() + rect().width()
+            > sceneRect.right())
+        {
+            setX(sceneRect.right()
+                 - rect().width());
+
             velocityX = 0;
         }
     }
 
+    QList<QGraphicsItem*> collidedItems =
+        collidingItems();
 
-    QList<QGraphicsItem*> collidedItems = collidingItems();
-    for (QGraphicsItem *item : collidedItems) {
-        Block *block = dynamic_cast<Block*>(item);
-        if (block) {
+    for (QGraphicsItem *item :
+         collidedItems)
+    {
+        Block *block =
+            dynamic_cast<Block*>(item);
+
+        if (block)
+        {
             block->applyEffect(this);
 
-            if (scene()) {
+            if (scene())
+            {
                 scene()->removeItem(block);
             }
 
@@ -307,42 +1131,39 @@ void Character::updateMovement()
             break;
         }
     }
-}
 
-int Character::calculateScore() const {
-    return damageDealt * 10;
+    updateSpriteAnimation();
 }
 
 void Character::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Left) {
+    if (event->key() == Qt::Key_Left ||
+        event->key() == Qt::Key_A)
+    {
         movingLeft = true;
     }
-    else if (event->key() == Qt::Key_Right) {
+    else if (event->key() == Qt::Key_Right ||
+             event->key() == Qt::Key_D)
+    {
         movingRight = true;
     }
-    else if (event->key() == Qt::Key_Up || event->key() == Qt::Key_Space) {
+    else if (event->key() == Qt::Key_Up ||
+             event->key() == Qt::Key_W)
+    {
         jump();
     }
 }
 
 void Character::keyReleaseEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Left) {
+    if (event->key() == Qt::Key_Left ||
+        event->key() == Qt::Key_A)
+    {
         movingLeft = false;
     }
-    else if (event->key() == Qt::Key_Right) {
+    else if (event->key() == Qt::Key_Right ||
+             event->key() == Qt::Key_D)
+    {
         movingRight = false;
     }
-}
-
-void Character::increaseHealth(int amount)
-{
-    health += amount;
-
-    if (health > 100) {
-        health = 100;
-    }
-
-    cout << name << " gained health. Current health: " << health << endl;
 }

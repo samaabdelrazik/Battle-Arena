@@ -8,7 +8,11 @@ class Mage : public Character
 public:
     Mage(string name);
 
-    int specialAbility();
+    int specialAbility() override;
+
+    void basicAttack(QPointF targetPoint) override;
+
+    void arcaneStormPulse();
 };
 
 #endif

@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/sprites">
+        <file alias="ranger.png">Effects/ranger spritesheet calciumtrice.png</file>
+        <file alias="warrior.png">Effects/warrior spritesheet calciumtrice.png</file>
+        <file alias="wizard.png">Effects/wizard spritesheet calciumtrice.png</file>
+
+        <file alias="minotaur_earth.png">Effects/minotaur_spritesheets/minotaurus_spritesheet_earth_original.png</file>
+        <file alias="minotaur_frost.png">Effects/minotaur_spritesheets/minotaurus_spritesheet_frost.png</file>
+        <file alias="minotaur_lava.png">Effects/minotaur_spritesheets/minotaurus_spritesheet_lava.png</file>
+        <file alias="minotaur_lightning.png">Effects/minotaur_spritesheets/minotaurus_spritesheet_lightning.png</file>
+    </qresource>
+</RCC>
