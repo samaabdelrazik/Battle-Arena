@@ -3,10 +3,22 @@
 
 #include <QBrush>
 #include <QTimer>
+#include <QDirIterator>
 
 GoodBlock::GoodBlock()
 {
-    setPixmap(QPixmap(":/images/coin.png").scaled(40,40));
+    QPixmap pix(":/images/coin.png");
+
+    if (pix.isNull()) {
+        qWarning() << "IMAGE LOAD FAILED! Path tried: :/images/coin.png";
+        // Let's see what is actually inside your resources right now
+        QDirIterator it(":", QDirIterator::Subdirectories);
+        while (it.hasNext()) {
+            qDebug() << "Available resource:" << it.next();
+        }
+    } else {
+        setPixmap(pix.scaled(40,40));
+    }
 }
 
 void GoodBlock::applyEffect(Character* character)

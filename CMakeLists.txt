@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(Battle_Arena VERSION 0.1 LANGUAGES CXX)
+set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -8,8 +9,12 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 qt_standard_project_setup()
 
+qt_add_resources(RESOURCES_SOURCES game-image.qrc resources.qrc)
+
 qt_add_executable(Battle_Arena
     main.cpp
+
+    ${RESOURCES_SOURCES}
 
     Character.h
     Character.cpp
@@ -45,7 +50,6 @@ qt_add_executable(Battle_Arena
     CombatEffect.h
     CombatEffect.cpp
 
-        resources/res.qrc
 
     battle_arenahome.h
     battle_arenahome.cpp
@@ -54,8 +58,6 @@ qt_add_executable(Battle_Arena
     CharacterSelect.h
     CharacterSelect.cpp
     CharacterSelect.ui
-
-    resources.qrc
 )
 
 target_link_libraries(Battle_Arena

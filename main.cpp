@@ -15,7 +15,6 @@
 #include <QBrush>
 #include <QPen>
 #include <QFont>
-#include <QProgressBar>
 
 #include "Character.h"
 #include "Archer.h"
@@ -94,19 +93,19 @@ public:
             warriorHoldAttacking = false;
 
             if (Archer *archer =
-                    dynamic_cast<Archer*>(player))
+                dynamic_cast<Archer*>(player))
             {
                 archer->stopRapidFire();
             }
 
             if (Warrior *warrior =
-                    dynamic_cast<Warrior*>(player))
+                dynamic_cast<Warrior*>(player))
             {
                 warrior->stopRapidAttack();
             }
 
             if (Mage *mage =
-                    dynamic_cast<Mage*>(player))
+                dynamic_cast<Mage*>(player))
             {
                 mage->stopRapidAttack();
             }
@@ -120,7 +119,7 @@ public:
         normalShootCounter++;
 
         if (Warrior *warrior =
-                dynamic_cast<Warrior*>(player))
+            dynamic_cast<Warrior*>(player))
         {
             warriorHoldCounter++;
 
@@ -163,7 +162,7 @@ public:
                 archer->rapidAttack(scenePos);
             }
             else if (Warrior *warrior =
-                         dynamic_cast<Warrior*>(player))
+                     dynamic_cast<Warrior*>(player))
             {
                 QPoint mousePos =
                     view->mapFromGlobal(QCursor::pos());
@@ -176,7 +175,7 @@ public:
             else
             {
                 if (Mage *mage =
-                        dynamic_cast<Mage*>(player))
+                    dynamic_cast<Mage*>(player))
                 {
                     if (!mage->isSpecialActive())
                     {
@@ -294,7 +293,7 @@ protected:
                             archer->specialAbility();
                         }
                         else if (Warrior *warrior =
-                                     dynamic_cast<Warrior*>(player))
+                                 dynamic_cast<Warrior*>(player))
                         {
                             QPoint mousePos =
                                 view->mapFromGlobal(QCursor::pos());
@@ -309,7 +308,7 @@ protected:
                         else
                         {
                             if (Mage *mage =
-                                    dynamic_cast<Mage*>(player))
+                                dynamic_cast<Mage*>(player))
                             {
                                 mage->stopRapidAttack();
                             }
@@ -445,43 +444,43 @@ int main(int argc, char *argv[])
 
     auto createPlayer =
         [&](const QString &characterType) {
-        if (player)
-        {
-            scene->removeItem(player);
-            delete player;
+            if (player)
+            {
+                scene->removeItem(player);
+                delete player;
 
-            player = nullptr;
-            archerPlayer = nullptr;
-            magePlayer = nullptr;
-        }
+                player = nullptr;
+                archerPlayer = nullptr;
+                magePlayer = nullptr;
+            }
 
-        if (characterType == "Archer")
-        {
-            player = new Archer("Player");
-            archerPlayer = dynamic_cast<Archer*>(player);
-            magePlayer = nullptr;
-        }
-        else if (characterType == "Mage")
-        {
-            player = new Mage("Player");
-            archerPlayer = nullptr;
-            magePlayer = dynamic_cast<Mage*>(player);
-        }
-        else
-        {
-            player = new Warrior("Player");
-            archerPlayer = nullptr;
-            magePlayer = nullptr;
-        }
+            if (characterType == "Archer")
+            {
+                player = new Archer("Player");
+                archerPlayer = dynamic_cast<Archer*>(player);
+                magePlayer = nullptr;
+            }
+            else if (characterType == "Mage")
+            {
+                player = new Mage("Player");
+                archerPlayer = nullptr;
+                magePlayer = dynamic_cast<Mage*>(player);
+            }
+            else
+            {
+                player = new Warrior("Player");
+                archerPlayer = nullptr;
+                magePlayer = nullptr;
+            }
 
-        player->setRect(0, 0, 50, 50);
-        player->setPos(100, 600);
-        player->setFlag(QGraphicsItem::ItemIsFocusable);
-        player->setZValue(20);
+            player->setRect(0, 0, 50, 50);
+            player->setPos(100, 600);
+            player->setFlag(QGraphicsItem::ItemIsFocusable);
+            player->setZValue(20);
 
-        scene->addItem(player);
-        player->setFocus();
-    };
+            scene->addItem(player);
+            player->setFocus();
+        };
 
     auto spawnEnemy = [&]() {
         if (totalEnemiesSpawned >= MAX_TOTAL_ENEMIES ||
@@ -599,343 +598,284 @@ int main(int argc, char *argv[])
 
     auto startArena =
         [&](const QString &characterType) {
-        createPlayer(characterType);
+            createPlayer(characterType);
 
-        if (filter)
-        {
-            a.removeEventFilter(filter);
-            view->removeEventFilter(filter);
-            view->viewport()->removeEventFilter(filter);
+            if (filter)
+            {
+                a.removeEventFilter(filter);
+                view->removeEventFilter(filter);
+                view->viewport()->removeEventFilter(filter);
 
-            delete filter;
-            filter = nullptr;
-        }
+                delete filter;
+                filter = nullptr;
+            }
 
-        filter = new ShootingFilter(player, view);
+            filter = new ShootingFilter(player, view);
 
-        a.installEventFilter(filter);
-        view->installEventFilter(filter);
-        view->viewport()->installEventFilter(filter);
+            a.installEventFilter(filter);
+            view->installEventFilter(filter);
+            view->viewport()->installEventFilter(filter);
 
-        QObject::connect(player,
-                         &Character::characterDied,
-                         [&](Character* dead) {
-            Q_UNUSED(dead);
+            QObject::connect(player,
+                             &Character::characterDied,
+                             [&](Character* dead) {
+                                 Q_UNUSED(dead);
 
-            timer->stop();
+                                 timer->stop();
 
-            QMessageBox::information(nullptr,
-                                     "Game Over",
-                                     "You lost!");
+                                 QMessageBox::information(nullptr,
+                                                          "Game Over",
+                                                          "You lost!");
+
+                                 restartLevel();
+                             });
 
             restartLevel();
-        });
 
-        restartLevel();
+            characterSelect.close();
+            view->show();
 
-        characterSelect.close();
-        view->show();
-
-        view->setFocus();
-        view->viewport()->setFocus();
-        player->setFocus();
-    };
+            view->setFocus();
+            view->viewport()->setFocus();
+            player->setFocus();
+        };
 
     QObject::connect(timer,
                      &QTimer::timeout,
                      [&]() {
-        if (!player)
-        {
-            return;
-        }
+                         if (!player)
+                         {
+                             return;
+                         }
 
-        framesSurvived++;
+                         framesSurvived++;
 
-        int secondsLeft =
-            60 - (framesSurvived / 60);
+                         int secondsLeft =
+                             60 - (framesSurvived / 60);
 
-        timerText->setPlainText(
-            "Time Left: " +
-            QString::number(secondsLeft));
-    QProgressBar *healthBar = new QProgressBar(view);
-    QProgressBar *scoreBar = new QProgressBar(view);
+                         timerText->setPlainText(
+                             "Time Left: " +
+                             QString::number(secondsLeft));
 
-    healthBar->setGeometry(20, 20, 250, 30);
-    scoreBar->setGeometry(20, 60, 250, 30);
+                         if (secondsLeft <= 0)
+                         {
+                             timer->stop();
 
-    healthBar->setRange(0, 100);
-    healthBar->setValue(player->getHealth());
+                             QMessageBox::information(
+                                 nullptr,
+                                 "Victory",
+                                 "You survived for 1 minute!");
 
-    scoreBar->setRange(0, 500);
-    scoreBar->setValue(player->getScore());
+                             restartLevel();
 
-    healthBar->setFormat("Health: %v");
-    scoreBar->setFormat("Score: %v");
+                             return;
+                         }
 
-    healthBar->setStyleSheet(
-        "QProgressBar {"
-        "border: 2px solid white;"
-        "border-radius: 5px;"
-        "text-align: center;"
-        "font-weight: bold;"
-        "background-color: black;"
-        "color: white;"
-        "}"
-        "QProgressBar::chunk {"
-        "background-color: red;"
-        "}"
-        );
+                         player->updateMovement();
 
-    scoreBar->setStyleSheet(
-        "QProgressBar {"
-        "border: 2px solid white;"
-        "border-radius: 5px;"
-        "text-align: center;"
-        "font-weight: bold;"
-        "background-color: black;"
-        "color: white;"
-        "}"
-        "QProgressBar::chunk {"
-        "background-color: green;"
-        "}"
-        );
+                         for (int i = activeEnemies.size() - 1;
+                              i >= 0;
+                              i--)
+                         {
+                             Enemy *enemy = activeEnemies[i];
 
-    healthBar->show();
-    scoreBar->show();
+                             enemy->updateLocation(*player);
 
-    QObject::connect(player, &Character::characterDied, [&](Character* dead) {
-        int score = player->calculateScore();
+                             if (!enemy->isAlive())
+                             {
+                                 totalEnemiesKilled++;
 
-        if (secondsLeft <= 0)
-        {
-            timer->stop();
+                                 enemyCounterText->setPlainText(
+                                     "Enemies Defeated: " +
+                                     QString::number(totalEnemiesKilled) +
+                                     " / 20");
 
-            QMessageBox::information(
-                nullptr,
-                "Victory",
-                "You survived for 1 minute!");
+                                 activeEnemies.removeAt(i);
 
-            restartLevel();
+                                 scene->removeItem(enemy);
+                                 delete enemy;
 
-            return;
-        }
+                                 if (totalEnemiesKilled >= MAX_TOTAL_ENEMIES)
+                                 {
+                                     timer->stop();
 
-        player->updateMovement();
+                                     QMessageBox::information(
+                                         nullptr,
+                                         "Victory",
+                                         "You defeated all 20 enemies!");
 
-        for (int i = activeEnemies.size() - 1;
-             i >= 0;
-             i--)
-        {
-            Enemy *enemy = activeEnemies[i];
+                                     restartLevel();
 
-            enemy->updateLocation(*player);
+                                     return;
+                                 }
 
-            if (!enemy->isAlive())
-            {
-                totalEnemiesKilled++;
+                                 spawnEnemy();
+                             }
+                         }
 
-                enemyCounterText->setPlainText(
-                    "Enemies Defeated: " +
-                    QString::number(totalEnemiesKilled) +
-                    " / 20");
+                         if (filter)
+                         {
+                             filter->updateNormalShooting();
+                         }
 
-                activeEnemies.removeAt(i);
+                         double specialPercent =
+                             player->getSpecialBar();
 
-                scene->removeItem(enemy);
-                delete enemy;
+                         if (specialPercent < 0)
+                         {
+                             specialPercent = 0;
+                         }
 
-                if (totalEnemiesKilled >= MAX_TOTAL_ENEMIES)
-                {
-                    timer->stop();
+                         if (specialPercent > 100)
+                         {
+                             specialPercent = 100;
+                         }
 
-                    QMessageBox::information(
-                        nullptr,
-                        "Victory",
-                        "You defeated all 20 enemies!");
+                         double barWidth =
+                             216.0 * (specialPercent / 100.0);
 
-                    restartLevel();
+                         specialBarFill->setRect(22, 47, barWidth, 16);
 
-                    return;
-                }
+                         specialText->setPlainText(
+                             "Special: " +
+                             QString::number((int)specialPercent) +
+                             "%");
 
-                spawnEnemy();
-            }
-        }
+                         if (player->isSpecialActive())
+                         {
+                             specialStatusText->setPlainText(
+                                 "SPECIAL ACTIVE");
+                         }
+                         else if (player->canUseSpecial())
+                         {
+                             specialStatusText->setPlainText(
+                                 "READY - Press R");
+                         }
+                         else
+                         {
+                             specialStatusText->setPlainText("");
+                         }
 
-        if (filter)
-        {
-            filter->updateNormalShooting();
-        }
+                         static int archerSpecialFireCounter = 0;
 
-        double specialPercent =
-            player->getSpecialBar();
+                         if (archerPlayer &&
+                             archerPlayer->isSpecialActive())
+                         {
+                             archerSpecialFireCounter++;
 
-        if (specialPercent < 0)
-        {
-            specialPercent = 0;
-        }
+                             archerPlayer->decreaseSpecialBar(0.16);
 
-        if (specialPercent > 100)
-        {
-            specialPercent = 100;
-        }
+                             if (archerPlayer->getSpecialBar() <= 0)
+                             {
+                                 archerPlayer->stopSpecial();
+                                 archerPlayer->stopAnimationSequence();
+                                 archerSpecialFireCounter = 0;
+                             }
+                             else if (archerSpecialFireCounter >= 7)
+                             {
+                                 QPoint mousePos =
+                                     view->mapFromGlobal(QCursor::pos());
 
-        double barWidth =
-            216.0 * (specialPercent / 100.0);
+                                 QPointF scenePos =
+                                     view->mapToScene(mousePos);
 
-        specialBarFill->setRect(22, 47, barWidth, 16);
+                                 archerPlayer->basicAttack(scenePos);
 
-        specialText->setPlainText(
-            "Special: " +
-            QString::number((int)specialPercent) +
-            "%");
+                                 archerSpecialFireCounter = 0;
+                             }
+                         }
+                         else
+                         {
+                             archerSpecialFireCounter = 0;
+                         }
 
-        if (player->isSpecialActive())
-        {
-            specialStatusText->setPlainText(
-                "SPECIAL ACTIVE");
-        }
-        else if (player->canUseSpecial())
-        {
-            specialStatusText->setPlainText(
-                "READY - Press R");
-        }
-        else
-        {
-            specialStatusText->setPlainText("");
-        }
+                         static int magePulseCounter = 0;
+                         static int magePulseDelayCounter = 0;
 
-        static int archerSpecialFireCounter = 0;
+                         if (magePlayer &&
+                             magePlayer->isSpecialActive())
+                         {
+                             magePulseDelayCounter++;
 
-        if (archerPlayer &&
-            archerPlayer->isSpecialActive())
-        {
-            archerSpecialFireCounter++;
+                             if (magePulseCounter == 0 ||
+                                 magePulseDelayCounter >= 30)
+                             {
+                                 magePlayer->arcaneStormPulse();
 
-            archerPlayer->decreaseSpecialBar(0.16);
+                                 magePlayer->decreaseSpecialBar(20.0);
 
-            if (archerPlayer->getSpecialBar() <= 0)
-            {
-                archerPlayer->stopSpecial();
-                archerPlayer->stopAnimationSequence();
-                archerSpecialFireCounter = 0;
-            }
-            else if (archerSpecialFireCounter >= 7)
-            {
-                QPoint mousePos =
-                    view->mapFromGlobal(QCursor::pos());
+                                 magePulseCounter++;
+                                 magePulseDelayCounter = 0;
 
-                QPointF scenePos =
-                    view->mapToScene(mousePos);
+                                 if (magePulseCounter >= 5 ||
+                                     magePlayer->getSpecialBar() <= 0)
+                                 {
+                                     magePlayer->stopSpecial();
 
-                archerPlayer->basicAttack(scenePos);
+                                     magePulseCounter = 0;
+                                     magePulseDelayCounter = 0;
+                                 }
+                             }
+                         }
+                         else
+                         {
+                             magePulseCounter = 0;
+                             magePulseDelayCounter = 0;
+                         }
 
-                archerSpecialFireCounter = 0;
-            }
-        }
-        else
-        {
-            archerSpecialFireCounter = 0;
-        }
-
-        static int magePulseCounter = 0;
-        static int magePulseDelayCounter = 0;
-
-        if (magePlayer &&
-            magePlayer->isSpecialActive())
-        {
-            magePulseDelayCounter++;
-
-            if (magePulseCounter == 0 ||
-                magePulseDelayCounter >= 30)
-            {
-                magePlayer->arcaneStormPulse();
-
-                magePlayer->decreaseSpecialBar(20.0);
-
-                magePulseCounter++;
-                magePulseDelayCounter = 0;
-
-                if (magePulseCounter >= 5 ||
-                    magePlayer->getSpecialBar() <= 0)
-                {
-                    magePlayer->stopSpecial();
-
-                    magePulseCounter = 0;
-                    magePulseDelayCounter = 0;
-                }
-            }
-        }
-        else
-        {
-            magePulseCounter = 0;
-            magePulseDelayCounter = 0;
-        }
-
-        player->setFocus();
-    });
+                         player->setFocus();
+                     });
 
     QObject::connect(&home,
                      &Battle_Arenahome::startButtonClicked,
                      [&]() {
-        home.close();
-        characterSelect.show();
-    });
+                         home.close();
+                         characterSelect.show();
+                     });
 
     QObject::connect(&home,
                      &Battle_Arenahome::exitButtonClicked,
                      [&]() {
-        home.close();
-    });
+                         home.close();
+                     });
 
     QObject::connect(&characterSelect,
                      &CharacterSelect::archerMaleSelected,
                      [&]() {
-        startArena("Archer");
-    });
+                         startArena("Archer");
+                     });
 
     QObject::connect(&characterSelect,
                      &CharacterSelect::archerFemaleSelected,
                      [&]() {
-        startArena("Archer");
-    });
+                         startArena("Archer");
+                     });
 
     QObject::connect(&characterSelect,
                      &CharacterSelect::mageMaleSelected,
                      [&]() {
-        startArena("Mage");
-    });
+                         startArena("Mage");
+                     });
 
     QObject::connect(&characterSelect,
                      &CharacterSelect::mageFemaleSelected,
                      [&]() {
-        startArena("Mage");
-    });
+                         startArena("Mage");
+                     });
 
     QObject::connect(&characterSelect,
                      &CharacterSelect::warriorMaleSelected,
                      [&]() {
-        startArena("Warrior");
-    });
+                         startArena("Warrior");
+                     });
 
     QObject::connect(&characterSelect,
                      &CharacterSelect::warriorFemaleSelected,
                      [&]() {
-        startArena("Warrior");
-    });
+                         startArena("Warrior");
+                     });
 
     home.show();
 
-    QTimer *timer = new QTimer();
-
-    QObject::connect(timer, &QTimer::timeout, [=]() {
-        archer->updateMovement();
-        enemy->updateLocation(*player);
-        healthBar->setValue(player->getHealth());
-
-        scoreBar->setValue(player->getScore());
-    });
-
-    timer->start(16);
     return a.exec();
 }
