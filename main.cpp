@@ -15,6 +15,9 @@
 #include <QBrush>
 #include <QPen>
 #include <QFont>
+#include <QPushButton>
+#include <functional>
+#include <QRandomGenerator>
 
 #include "Character.h"
 #include "Archer.h"
@@ -350,8 +353,10 @@ int main(int argc, char *argv[])
     int totalEnemiesSpawned = 0;
     int totalEnemiesKilled = 0;
     int framesSurvived = 0;
+    int currentLevel = 1;
 
-    const int MAX_TOTAL_ENEMIES = 20;
+    const int LEVEL_ENEMY_COUNTS[3] = {20, 30, 40};
+    const int MAX_LEVELS = 3;
     const int MAX_ACTIVE_ENEMIES = 5;
 
     Platform *ground = new Platform(0, 650, 1000, 50);
@@ -364,25 +369,43 @@ int main(int argc, char *argv[])
     scene->addItem(platform2);
     scene->addItem(platform3);
 
-    auto spawnBlocks = [&]() {
-        GoodBlock *good1 = new GoodBlock();
-        good1->setPos(240, 480);
-        scene->addItem(good1);
+    // auto spawnBlocks = [&]() {
+    //     GoodBlock *good1 = new GoodBlock();
+    //     good1->setPos(240, 480);
+    //     scene->addItem(good1);
 
-        GoodBlock *good2 = new GoodBlock();
-        good2->setPos(510, 380);
-        scene->addItem(good2);
+    //     GoodBlock *good2 = new GoodBlock();
+    //     good2->setPos(510, 380);
+    //     scene->addItem(good2);
 
-        BadBlock *bad1 = new BadBlock();
-        bad1->setPos(780, 280);
-        scene->addItem(bad1);
+    //     BadBlock *bad1 = new BadBlock();
+    //     bad1->setPos(780, 280);
+    //     scene->addItem(bad1);
 
-        BadBlock *bad2 = new BadBlock();
-        bad2->setPos(600, 610);
-        scene->addItem(bad2);
-    };
+    //     BadBlock *bad2 = new BadBlock();
+    //     bad2->setPos(600, 610);
+    //     scene->addItem(bad2);
+    // };
 
-    spawnBlocks();
+    // spawnBlocks();
+
+
+    QTimer *time = new QTimer(nullptr);
+    QObject::connect(time, &QTimer::timeout, [time, scene](){
+        Block *block;
+        if(QRandomGenerator::global()->bounded(100)<60)
+            block = new GoodBlock();
+        else
+            block = new BadBlock();
+
+        int x = QRandomGenerator::global()->bounded(0, 1000);
+        int y = QRandomGenerator::global()->bounded(0, 650);
+        block->setPos(x,y);
+
+        scene->addItem(block);
+        time->start(QRandomGenerator::global()->bounded(2000, 5000));
+    });
+    time->start(QRandomGenerator::global()->bounded(2000, 5000));
 
     QGraphicsTextItem *specialText =
         new QGraphicsTextItem("Special: 0%");
@@ -421,6 +444,14 @@ int main(int argc, char *argv[])
     enemyCounterText->setPos(700, 15);
     enemyCounterText->setZValue(1000);
     scene->addItem(enemyCounterText);
+
+    QGraphicsTextItem *levelText =
+        new QGraphicsTextItem("Level: 1");
+    levelText->setDefaultTextColor(Qt::yellow);
+    levelText->setFont(QFont("Arial", 14, QFont::Bold));
+    levelText->setPos(700, 75);
+    levelText->setZValue(1000);
+    scene->addItem(levelText);
 
     QGraphicsTextItem *timerText =
         new QGraphicsTextItem("Time Left: 60");
@@ -483,7 +514,7 @@ int main(int argc, char *argv[])
         };
 
     auto spawnEnemy = [&]() {
-        if (totalEnemiesSpawned >= MAX_TOTAL_ENEMIES ||
+        if (totalEnemiesSpawned >= LEVEL_ENEMY_COUNTS[currentLevel - 1] ||
             !player)
         {
             return;
@@ -534,7 +565,7 @@ int main(int argc, char *argv[])
 
     auto spawnInitialEnemies = [&]() {
         while (activeEnemies.size() < MAX_ACTIVE_ENEMIES &&
-               totalEnemiesSpawned < MAX_TOTAL_ENEMIES)
+               totalEnemiesSpawned < LEVEL_ENEMY_COUNTS[currentLevel - 1])
         {
             spawnEnemy();
         }
@@ -569,7 +600,85 @@ int main(int argc, char *argv[])
         activeEnemies.clear();
     };
 
-    auto restartLevel = [&]() {
+
+    std::function<void()> restartLevel;
+
+
+    auto showEndPopup = [&](bool won)
+    {
+        timer->stop();
+
+        QMessageBox msgBox;
+
+        msgBox.setWindowTitle("Game Over");
+
+        QString resultText;
+
+        if (won)
+        {
+            resultText = "YOU WON!";
+        }
+        else
+        {
+            resultText = "YOU LOST!";
+        }
+
+        resultText += "\n\nFinal Score: ";
+        resultText += QString::number(
+            player->calculateScore());
+
+        msgBox.setText(resultText);
+
+        QAbstractButton *playAgainButton =
+            msgBox.addButton(
+                "Play Again",
+                QMessageBox::AcceptRole);
+
+        QAbstractButton *exitButton =
+            msgBox.addButton(
+                "Exit",
+                QMessageBox::RejectRole);
+
+        msgBox.exec();
+
+        if (msgBox.clickedButton() ==
+            playAgainButton)
+        {
+            timer->stop();
+
+            QTimer::singleShot(0, [&]()
+                               {
+                                   currentLevel = 1;
+
+                                   totalEnemiesSpawned = 0;
+                                   totalEnemiesKilled = 0;
+                                   framesSurvived = 0;
+
+                                   clearEnemies();
+                                   clearArrowsAndBlocks();
+
+                                   if (filter)
+                                   {
+                                       a.removeEventFilter(filter);
+                                       view->removeEventFilter(filter);
+                                       view->viewport()->removeEventFilter(filter);
+
+                                       delete filter;
+                                       filter = nullptr;
+                                   }
+
+                                   view->hide();
+
+                                   home.show();
+                               });
+        }
+        else
+        {
+            QApplication::quit();
+        }
+    };
+
+    restartLevel = [&]() {
         clearArrowsAndBlocks();
         clearEnemies();
 
@@ -578,7 +687,13 @@ int main(int argc, char *argv[])
         framesSurvived = 0;
 
         enemyCounterText->setPlainText(
-            "Enemies Defeated: 0 / 20");
+            "Enemies Defeated: 0 / " +
+            QString::number(
+                LEVEL_ENEMY_COUNTS[currentLevel - 1]));
+
+        levelText->setPlainText(
+            "Level: " +
+            QString::number(currentLevel));
 
         timerText->setPlainText("Time Left: 60");
 
@@ -590,7 +705,7 @@ int main(int argc, char *argv[])
             player->setFocus();
         }
 
-        spawnBlocks();
+        // spawnBlocks();
         spawnInitialEnemies();
 
         timer->start(16);
@@ -598,6 +713,15 @@ int main(int argc, char *argv[])
 
     auto startArena =
         [&](const QString &characterType) {
+
+            timer->stop();
+
+            clearEnemies();
+            clearArrowsAndBlocks();
+
+            totalEnemiesSpawned = 0;
+            totalEnemiesKilled = 0;
+            framesSurvived = 0;
             createPlayer(characterType);
 
             if (filter)
@@ -621,18 +745,12 @@ int main(int argc, char *argv[])
                              [&](Character* dead) {
                                  Q_UNUSED(dead);
 
-                                 timer->stop();
-
-                                 QMessageBox::information(nullptr,
-                                                          "Game Over",
-                                                          "You lost!");
-
-                                 restartLevel();
+                                 showEndPopup(false);
                              });
 
             restartLevel();
 
-            characterSelect.close();
+            characterSelect.hide();
             view->show();
 
             view->setFocus();
@@ -661,12 +779,22 @@ int main(int argc, char *argv[])
                          {
                              timer->stop();
 
-                             QMessageBox::information(
-                                 nullptr,
-                                 "Victory",
-                                 "You survived for 1 minute!");
+                             if (currentLevel >= MAX_LEVELS)
+                             {
+                                 showEndPopup(true);
+                             }
+                             else
+                             {
+                                 currentLevel++;
 
-                             restartLevel();
+                                 QMessageBox::information(
+                                     nullptr,
+                                     "Level Complete",
+                                     "Starting Level " +
+                                         QString::number(currentLevel));
+
+                                 restartLevel();
+                             }
 
                              return;
                          }
@@ -685,26 +813,41 @@ int main(int argc, char *argv[])
                              {
                                  totalEnemiesKilled++;
 
+                                 player->increaseScore(100);
+
                                  enemyCounterText->setPlainText(
                                      "Enemies Defeated: " +
                                      QString::number(totalEnemiesKilled) +
-                                     " / 20");
+                                     " / " +
+                                     QString::number(
+                                         LEVEL_ENEMY_COUNTS[currentLevel - 1]));
 
                                  activeEnemies.removeAt(i);
 
                                  scene->removeItem(enemy);
                                  delete enemy;
 
-                                 if (totalEnemiesKilled >= MAX_TOTAL_ENEMIES)
+                                 if (totalEnemiesKilled >=
+                                     LEVEL_ENEMY_COUNTS[currentLevel - 1])
                                  {
                                      timer->stop();
 
-                                     QMessageBox::information(
-                                         nullptr,
-                                         "Victory",
-                                         "You defeated all 20 enemies!");
+                                     if (currentLevel >= MAX_LEVELS)
+                                     {
+                                         showEndPopup(true);
+                                     }
+                                     else
+                                     {
+                                         currentLevel++;
 
-                                     restartLevel();
+                                         QMessageBox::information(
+                                             nullptr,
+                                             "Level Complete",
+                                             "Starting Level " +
+                                                 QString::number(currentLevel));
+
+                                         restartLevel();
+                                     }
 
                                      return;
                                  }

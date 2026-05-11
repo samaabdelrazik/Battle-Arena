@@ -18,7 +18,6 @@ Block::Block()
     });
     timer->start(32);
 }
-
 Block::~Block()
 {
     timer->stop();
