@@ -15,6 +15,7 @@
 #include <QBrush>
 #include <QPen>
 #include <QFont>
+#include <QProgressBar>
 
 #include "Character.h"
 #include "Archer.h"
@@ -656,6 +657,54 @@ int main(int argc, char *argv[])
         timerText->setPlainText(
             "Time Left: " +
             QString::number(secondsLeft));
+    QProgressBar *healthBar = new QProgressBar(view);
+    QProgressBar *scoreBar = new QProgressBar(view);
+
+    healthBar->setGeometry(20, 20, 250, 30);
+    scoreBar->setGeometry(20, 60, 250, 30);
+
+    healthBar->setRange(0, 100);
+    healthBar->setValue(player->getHealth());
+
+    scoreBar->setRange(0, 500);
+    scoreBar->setValue(player->getScore());
+
+    healthBar->setFormat("Health: %v");
+    scoreBar->setFormat("Score: %v");
+
+    healthBar->setStyleSheet(
+        "QProgressBar {"
+        "border: 2px solid white;"
+        "border-radius: 5px;"
+        "text-align: center;"
+        "font-weight: bold;"
+        "background-color: black;"
+        "color: white;"
+        "}"
+        "QProgressBar::chunk {"
+        "background-color: red;"
+        "}"
+        );
+
+    scoreBar->setStyleSheet(
+        "QProgressBar {"
+        "border: 2px solid white;"
+        "border-radius: 5px;"
+        "text-align: center;"
+        "font-weight: bold;"
+        "background-color: black;"
+        "color: white;"
+        "}"
+        "QProgressBar::chunk {"
+        "background-color: green;"
+        "}"
+        );
+
+    healthBar->show();
+    scoreBar->show();
+
+    QObject::connect(player, &Character::characterDied, [&](Character* dead) {
+        int score = player->calculateScore();
 
         if (secondsLeft <= 0)
         {
@@ -877,5 +926,16 @@ int main(int argc, char *argv[])
 
     home.show();
 
+    QTimer *timer = new QTimer();
+
+    QObject::connect(timer, &QTimer::timeout, [=]() {
+        archer->updateMovement();
+        enemy->updateLocation(*player);
+        healthBar->setValue(player->getHealth());
+
+        scoreBar->setValue(player->getScore());
+    });
+
+    timer->start(16);
     return a.exec();
 }

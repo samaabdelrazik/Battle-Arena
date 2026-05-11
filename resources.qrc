@@ -1,3 +1,4 @@
+
 <RCC>
     <qresource prefix="/sprites">
         <file alias="ranger.png">Effects/ranger spritesheet calciumtrice.png</file>
@@ -10,3 +11,4 @@
         <file alias="minotaur_lightning.png">Effects/minotaur_spritesheets/minotaurus_spritesheet_lightning.png</file>
     </qresource>
 </RCC>
+

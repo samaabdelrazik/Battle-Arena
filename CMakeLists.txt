@@ -41,8 +41,11 @@ qt_add_executable(Battle_Arena
     Arrow.h
     Arrow.cpp
 
+
     CombatEffect.h
     CombatEffect.cpp
+
+        resources/res.qrc
 
     battle_arenahome.h
     battle_arenahome.cpp
