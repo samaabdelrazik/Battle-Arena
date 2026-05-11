@@ -1,5 +1,6 @@
 #include "BadBlock.h"
 #include "Character.h"
+
 #include <QBrush>
 
 BadBlock::BadBlock()
@@ -9,9 +10,9 @@ BadBlock::BadBlock()
 
 void BadBlock::applyEffect(Character* character)
 {
-    character->decreaseHealth(15);
-    character->decreaseScore(5);
-    character->decreasePower(1);
+    character->decreaseHealth(10);
+    character->decreaseScore(10);
+    character->decreaseSpecialBar(5.0);
 }
 
 BadBlock::~BadBlock()

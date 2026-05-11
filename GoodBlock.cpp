@@ -1,5 +1,6 @@
 #include "GoodBlock.h"
 #include "Character.h"
+
 #include <QBrush>
 #include <QTimer>
 
@@ -10,9 +11,9 @@ GoodBlock::GoodBlock()
 
 void GoodBlock::applyEffect(Character* character)
 {
-    character->increaseHealth(20);
+    character->increaseHealth(10);
     character->increaseScore(10);
-    character->increasePower(1);
+    character->increaseSpecialBar(15.0);
 }
 
 GoodBlock::~GoodBlock()

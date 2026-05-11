@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CharacterSelect</class>
+ <widget class="QMainWindow" name="CharacterSelect">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>650</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Choose Character</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+background-color:#141414;
+color:white;
+font-family:Arial;
+   </string>
+  </property>
+
+  <widget class="QWidget" name="centralwidget">
+
+   <widget class="QLabel" name="titleLabel">
+    <property name="geometry">
+     <rect><x>250</x><y>30</y><width>500</width><height>55</height></rect>
+    </property>
+    <property name="text">
+     <string>Choose Your Character</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font-size:32px;font-weight:bold;color:white;</string>
+    </property>
+   </widget>
+
+   <widget class="QFrame" name="rangerFrame">
+    <property name="geometry">
+     <rect><x>55</x><y>125</y><width>270</width><height>430</height></rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QFrame{background-color:#1f1f1f;border:3px solid #0099ff;border-radius:18px;}</string>
+    </property>
+
+    <widget class="QLabel" name="rangerTitle">
+     <property name="geometry">
+      <rect><x>35</x><y>18</y><width>200</width><height>35</height></rect>
+     </property>
+     <property name="text"><string>RANGER</string></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="styleSheet">
+      <string notr="true">font-size:24px;font-weight:bold;color:#00aaff;border:none;</string>
+     </property>
+    </widget>
+
+    <widget class="QLabel" name="rangerImage">
+     <property name="geometry">
+      <rect><x>75</x><y>75</y><width>120</width><height>120</height></rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border:none;background:transparent;</string>
+     </property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+    </widget>
+
+    <widget class="QPushButton" name="rangerSelectButton">
+     <property name="geometry">
+      <rect><x>45</x><y>220</y><width>180</width><height>45</height></rect>
+     </property>
+     <property name="text"><string>Select Ranger</string></property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{background-color:#0077cc;border:none;border-radius:10px;font-size:16px;font-weight:bold;color:white;} QPushButton:hover{background-color:#0099ff;}</string>
+     </property>
+    </widget>
+
+    <widget class="QLabel" name="rangerDesc">
+     <property name="geometry">
+      <rect><x>30</x><y>300</y><width>210</width><height>80</height></rect>
+     </property>
+     <property name="text"><string>Fast ranged fighter with rapid bow attacks and high mobility.</string></property>
+     <property name="wordWrap"><bool>true</bool></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="styleSheet">
+      <string notr="true">font-size:14px;border:none;</string>
+     </property>
+    </widget>
+   </widget>
+
+   <widget class="QFrame" name="wizardFrame">
+    <property name="geometry">
+     <rect><x>365</x><y>125</y><width>270</width><height>430</height></rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QFrame{background-color:#1f1f1f;border:3px solid #bb00ff;border-radius:18px;}</string>
+    </property>
+
+    <widget class="QLabel" name="wizardTitle">
+     <property name="geometry">
+      <rect><x>35</x><y>18</y><width>200</width><height>35</height></rect>
+     </property>
+     <property name="text"><string>WIZARD</string></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="styleSheet">
+      <string notr="true">font-size:24px;font-weight:bold;color:#cc55ff;border:none;</string>
+     </property>
+    </widget>
+
+    <widget class="QLabel" name="wizardImage">
+     <property name="geometry">
+      <rect><x>75</x><y>75</y><width>120</width><height>120</height></rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border:none;background:transparent;</string>
+     </property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+    </widget>
+
+    <widget class="QPushButton" name="wizardSelectButton">
+     <property name="geometry">
+      <rect><x>45</x><y>220</y><width>180</width><height>45</height></rect>
+     </property>
+     <property name="text"><string>Select Wizard</string></property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{background-color:#9900cc;border:none;border-radius:10px;font-size:16px;font-weight:bold;color:white;} QPushButton:hover{background-color:#bb00ff;}</string>
+     </property>
+    </widget>
+
+    <widget class="QLabel" name="wizardDesc">
+     <property name="geometry">
+      <rect><x>30</x><y>300</y><width>210</width><height>90</height></rect>
+     </property>
+     <property name="text"><string>Magic specialist using projectiles, energy pulses, and arcane storm attacks.</string></property>
+     <property name="wordWrap"><bool>true</bool></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="styleSheet">
+      <string notr="true">font-size:14px;border:none;</string>
+     </property>
+    </widget>
+   </widget>
+
+   <widget class="QFrame" name="warriorFrame">
+    <property name="geometry">
+     <rect><x>675</x><y>125</y><width>270</width><height>430</height></rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QFrame{background-color:#1f1f1f;border:3px solid #ff5500;border-radius:18px;}</string>
+    </property>
+
+    <widget class="QLabel" name="warriorTitle">
+     <property name="geometry">
+      <rect><x>35</x><y>18</y><width>200</width><height>35</height></rect>
+     </property>
+     <property name="text"><string>WARRIOR</string></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="styleSheet">
+      <string notr="true">font-size:24px;font-weight:bold;color:#ff7733;border:none;</string>
+     </property>
+    </widget>
+
+    <widget class="QLabel" name="warriorImage">
+     <property name="geometry">
+      <rect><x>75</x><y>75</y><width>120</width><height>120</height></rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border:none;background:transparent;</string>
+     </property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+    </widget>
+
+    <widget class="QPushButton" name="warriorSelectButton">
+     <property name="geometry">
+      <rect><x>45</x><y>220</y><width>180</width><height>45</height></rect>
+     </property>
+     <property name="text"><string>Select Warrior</string></property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{background-color:#cc4400;border:none;border-radius:10px;font-size:16px;font-weight:bold;color:white;} QPushButton:hover{background-color:#ff6600;}</string>
+     </property>
+    </widget>
+
+    <widget class="QLabel" name="warriorDesc">
+     <property name="geometry">
+      <rect><x>30</x><y>300</y><width>210</width><height>90</height></rect>
+     </property>
+     <property name="text"><string>Heavy melee fighter with sword attacks, strong knockback, and high durability.</string></property>
+     <property name="wordWrap"><bool>true</bool></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="styleSheet">
+      <string notr="true">font-size:14px;border:none;</string>
+     </property>
+    </widget>
+   </widget>
+
+  </widget>
+
+  <widget class="QMenuBar" name="menubar"/>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>
