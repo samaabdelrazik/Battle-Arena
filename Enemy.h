@@ -7,6 +7,7 @@
 #include <QBrush>
 #include <QPointF>
 #include <QGraphicsRectItem>
+#include <QString>
 
 using namespace std;
 
@@ -28,6 +29,8 @@ private:
     int telegraphTimer = 0;
     int cooldownTimer = 0;
     int jumpCooldown = 0;
+    int attackTimer = 0;
+    bool attackDamageApplied = false;
 
     float speed = 2.5f;
     float jumpStrength = -12.0f;
@@ -36,9 +39,17 @@ private:
     QGraphicsRectItem *healthBarFill = nullptr;
 
     int maxEnemyHealth = 100;
+    int formationIndex = 0;
+
+    bool canAttackPlayer(Character &player) const;
+    double targetAttackCenterX(Character &player) const;
+    bool shouldFaceRight(Character &player) const;
+    void applyAttackDamage(Character &player);
 
 public:
-    Enemy(string name);
+    Enemy(string name,
+          const QString &spritePath = ":/sprites/minotaur_earth.png",
+          int formationIndex = 0);
 
     void updateLocation(Character &player);
 
@@ -50,8 +61,9 @@ public:
     void attack(Character &player);
     void handleChase(Character &player);
     void handleCooldown();
-    void handleTelegraph();
+    void handleTelegraph(Character &player);
     void handleGravity();
+    void separateFromOtherEnemies();
 
     void updateHealthBar();
 

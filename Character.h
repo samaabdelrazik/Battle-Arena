@@ -2,6 +2,8 @@
 #define CHARACTER_H
 
 #include <string>
+#include <vector>
+
 #include <QGraphicsRectItem>
 #include <QGraphicsPixmapItem>
 #include <QKeyEvent>
@@ -19,6 +21,19 @@ enum class FacingDirection
     Right,
     Left,
     OutScreen
+};
+
+struct AnimationFrame
+{
+    int row;
+    int column;
+
+    AnimationFrame(int r = 0,
+                   int c = 0)
+        : row(r),
+          column(c)
+    {
+    }
 };
 
 class Character : public QObject,
@@ -109,6 +124,10 @@ private:
 
     bool modernFacingRight = true;
 
+    bool modernMovementHintActive = false;
+    bool modernMovementHintMoving = false;
+    bool modernMovementHintFacingRight = true;
+
     bool modernAttackAnimationActive = false;
     int modernAttackFrame = 0;
     int modernAttackHoldCounter = 0;
@@ -116,9 +135,16 @@ private:
     int modernAttackSlowFrameDelay = 2;
     int modernAttackFastFrameDelay = 1;
 
-    bool modernMovementHintActive = false;
-    bool modernMovementHintMoving = false;
-    bool modernMovementHintFacingRight = true;
+    std::vector<AnimationFrame> currentAnimationFrames;
+
+    bool animationLooping = false;
+    bool animationPlaying = false;
+
+    int animationFrameIndex = 0;
+    int animationFrameDelay = 4;
+    int animationCounter = 0;
+    int animationEndHoldFrames = 0;
+    int animationEndHoldCounter = 0;
 
     int rowForFacingDirection() const;
 
@@ -180,6 +206,17 @@ public:
                               int attackFrameCount = 10);
 
     void playModernAttackAnimation(bool attackingRight);
+
+    void playAnimationSequence(
+        const std::vector<AnimationFrame>& frames,
+        bool loop,
+        int frameDelay,
+        int endHoldFrames = 0
+    );
+
+    void stopAnimationSequence();
+
+    bool isAnimationPlaying() const;
 
     void setModernSpriteTargetSize(const QSize &size);
 

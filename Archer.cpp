@@ -4,6 +4,7 @@
 #include <iostream>
 #include <QBrush>
 #include <QGraphicsScene>
+#include <QTimer>
 #include <cmath>
 
 using namespace std;
@@ -34,17 +35,30 @@ int Archer::specialAbility()
     cout << getName()
          << " uses Infinite Arrow Barrage!\n";
 
+    startSpecial();
+
+    std::vector<AnimationFrame> specialFrames =
+    {
+        AnimationFrame(3, 4),
+        AnimationFrame(3, 6),
+        AnimationFrame(3, 7)
+    };
+
+    playAnimationSequence(
+        specialFrames,
+        true,
+        2
+    );
+
     return getAttackDamage() * 2;
 }
 
-void Archer::basicAttack(QPointF targetPoint)
+void Archer::fireArrowAt(QPointF targetPoint)
 {
-    setFacingFromTarget(targetPoint);
-
-    bool attackingRight =
-        targetPoint.x() >= x() + rect().width() / 2.0;
-
-    playModernAttackAnimation(attackingRight);
+    if (!scene() || !isAlive())
+    {
+        return;
+    }
 
     double centerX =
         x() + rect().width() / 2;
@@ -64,8 +78,133 @@ void Archer::basicAttack(QPointF targetPoint)
 
     arrow->setPos(centerX, centerY);
 
-    if (scene())
+    scene()->addItem(arrow);
+}
+
+void Archer::basicAttack(QPointF targetPoint)
+{
+    if (isSpecialActive())
     {
-        scene()->addItem(arrow);
+        setFacingFromTarget(targetPoint);
+        rapidFiring = false;
+
+        if (!isAnimationPlaying())
+        {
+            std::vector<AnimationFrame> specialFrames =
+            {
+                AnimationFrame(3, 4),
+                AnimationFrame(3, 6),
+                AnimationFrame(3, 7)
+            };
+
+            playAnimationSequence(
+                specialFrames,
+                true,
+                2
+            );
+        }
+    }
+    else
+    {
+        if (isAnimationPlaying())
+        {
+            return;
+        }
+
+        setFacingFromTarget(targetPoint);
+        rapidFiring = false;
+        normalShotGeneration++;
+
+        std::vector<AnimationFrame> normalAttackFrames =
+        {
+            AnimationFrame(3, 0),
+            AnimationFrame(3, 1),
+            AnimationFrame(3, 2),
+            AnimationFrame(3, 3),
+            AnimationFrame(3, 4),
+            AnimationFrame(3, 5),
+            AnimationFrame(3, 6),
+            AnimationFrame(3, 7),
+            AnimationFrame(3, 8),
+            AnimationFrame(3, 9)
+        };
+
+        playAnimationSequence(
+            normalAttackFrames,
+            false,
+            4,
+            6
+        );
+
+        int releaseDelayMs =
+            7 * 4 * 16;
+
+        int shotGeneration =
+            normalShotGeneration;
+
+        QTimer::singleShot(
+            releaseDelayMs,
+            this,
+            [this, targetPoint, shotGeneration]() {
+                if (!isSpecialActive() &&
+                    !rapidFiring &&
+                    shotGeneration == normalShotGeneration)
+                {
+                    fireArrowAt(targetPoint);
+                }
+            }
+        );
+
+        return;
+    }
+
+    fireArrowAt(targetPoint);
+}
+
+void Archer::rapidAttack(QPointF targetPoint)
+{
+    setFacingFromTarget(targetPoint);
+
+    if (!isSpecialActive() && !rapidFiring)
+    {
+        normalShotGeneration++;
+    }
+
+    if (!isSpecialActive() &&
+        (!rapidFiring || !isAnimationPlaying()))
+    {
+        std::vector<AnimationFrame> rapidFrames =
+        {
+            AnimationFrame(3, 3),
+            AnimationFrame(3, 4),
+            AnimationFrame(3, 5),
+            AnimationFrame(3, 6),
+            AnimationFrame(3, 7)
+        };
+
+        playAnimationSequence(
+            rapidFrames,
+            true,
+            3
+        );
+    }
+
+    rapidFiring = true;
+
+    fireArrowAt(targetPoint);
+}
+
+void Archer::stopRapidFire()
+{
+    if (!rapidFiring)
+    {
+        return;
+    }
+
+    rapidFiring = false;
+
+    if (!isSpecialActive())
+    {
+        stopAnimationSequence();
     }
 }

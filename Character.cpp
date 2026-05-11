@@ -232,6 +232,30 @@ void Character::setModernSpriteSheet(const QString &spritePath,
         possiblePaths << appDir + "/../../../Effects/minotaur_spritesheets/minotaurus_spritesheet_earth_original.png";
         possiblePaths << "P:/CS2 project/Battle-Arena/Effects/minotaur_spritesheets/minotaurus_spritesheet_earth_original.png";
     }
+    else if (fileName == "minotaur_frost.png")
+    {
+        possiblePaths << "Effects/minotaur_spritesheets/minotaurus_spritesheet_frost.png";
+        possiblePaths << appDir + "/../Effects/minotaur_spritesheets/minotaurus_spritesheet_frost.png";
+        possiblePaths << appDir + "/../../Effects/minotaur_spritesheets/minotaurus_spritesheet_frost.png";
+        possiblePaths << appDir + "/../../../Effects/minotaur_spritesheets/minotaurus_spritesheet_frost.png";
+        possiblePaths << "P:/CS2 project/Battle-Arena/Effects/minotaur_spritesheets/minotaurus_spritesheet_frost.png";
+    }
+    else if (fileName == "minotaur_lava.png")
+    {
+        possiblePaths << "Effects/minotaur_spritesheets/minotaurus_spritesheet_lava.png";
+        possiblePaths << appDir + "/../Effects/minotaur_spritesheets/minotaurus_spritesheet_lava.png";
+        possiblePaths << appDir + "/../../Effects/minotaur_spritesheets/minotaurus_spritesheet_lava.png";
+        possiblePaths << appDir + "/../../../Effects/minotaur_spritesheets/minotaurus_spritesheet_lava.png";
+        possiblePaths << "P:/CS2 project/Battle-Arena/Effects/minotaur_spritesheets/minotaurus_spritesheet_lava.png";
+    }
+    else if (fileName == "minotaur_lightning.png")
+    {
+        possiblePaths << "Effects/minotaur_spritesheets/minotaurus_spritesheet_lightning.png";
+        possiblePaths << appDir + "/../Effects/minotaur_spritesheets/minotaurus_spritesheet_lightning.png";
+        possiblePaths << appDir + "/../../Effects/minotaur_spritesheets/minotaurus_spritesheet_lightning.png";
+        possiblePaths << appDir + "/../../../Effects/minotaur_spritesheets/minotaurus_spritesheet_lightning.png";
+        possiblePaths << "P:/CS2 project/Battle-Arena/Effects/minotaur_spritesheets/minotaurus_spritesheet_lightning.png";
+    }
 
     possiblePaths << "Effects/" + fileName;
     possiblePaths << appDir + "/Effects/" + fileName;
@@ -351,7 +375,7 @@ void Character::clearAnimationMovementHint()
 
 void Character::stepSpriteAnimation()
 {
-    updateSpriteAnimation();
+    updateModernSpriteAnimation();
 }
 
 int Character::rowForFacingDirection() const
@@ -385,6 +409,8 @@ void Character::setFacingFromTarget(QPointF targetPoint)
     double dx = targetPoint.x() - centerX;
     double dy = targetPoint.y() - centerY;
 
+    modernFacingRight = dx >= 0;
+
     double verticalThreshold = 25.0;
 
     if (dy > verticalThreshold)
@@ -400,12 +426,10 @@ void Character::setFacingFromTarget(QPointF targetPoint)
         if (dx >= 0)
         {
             facingDirection = FacingDirection::Right;
-            modernFacingRight = true;
         }
         else
         {
             facingDirection = FacingDirection::Left;
-            modernFacingRight = false;
         }
     }
 
@@ -575,7 +599,9 @@ void Character::updateModernSpriteFrame(int row,
         (rect().width() - scaledFrame.width()) / 2.0;
 
     double spriteY =
-        rect().height() - scaledFrame.height();
+        rect().height() -
+        scaledFrame.height() +
+        modernSpriteGroundOffset;
 
     spriteItem->setPos(spriteX, spriteY);
     spriteItem->setZValue(10);
@@ -630,94 +656,183 @@ void Character::updateSpriteAnimation()
     updateSpriteFrame();
 }
 
+void Character::playAnimationSequence(
+    const std::vector<AnimationFrame>& frames,
+    bool loop,
+    int frameDelay,
+    int endHoldFrames)
+{
+    if (frames.empty())
+    {
+        return;
+    }
+
+    currentAnimationFrames = frames;
+
+    animationLooping = loop;
+    animationPlaying = true;
+
+    animationFrameIndex = 0;
+    animationCounter = 0;
+
+    animationFrameDelay = frameDelay;
+    animationEndHoldFrames = endHoldFrames;
+    animationEndHoldCounter = 0;
+
+    updateModernSpriteFrame(
+        currentAnimationFrames[0].row,
+        currentAnimationFrames[0].column
+    );
+}
+
+void Character::stopAnimationSequence()
+{
+    animationPlaying = false;
+
+    animationFrameIndex = 0;
+    animationCounter = 0;
+    animationEndHoldFrames = 0;
+    animationEndHoldCounter = 0;
+
+    currentAnimationFrames.clear();
+}
+
+bool Character::isAnimationPlaying() const
+{
+    return animationPlaying;
+}
+
 void Character::updateModernSpriteAnimation()
 {
-    if (modernMovementHintActive)
+    if (!usingModernSpriteSheet)
     {
-        modernFacingRight = modernMovementHintFacingRight;
-    }
-    else
-    {
-        updateFacingFromMovement();
+        return;
     }
 
-    if (modernAttackAnimationActive)
+    if (animationPlaying)
     {
-        modernAttackHoldCounter++;
+        animationCounter++;
 
-        if (modernAttackHoldCounter >= modernAttackFrameDelay)
+        if (animationCounter >= animationFrameDelay)
         {
-            modernAttackFrame++;
-            modernAttackHoldCounter = 0;
+            animationCounter = 0;
+
+            animationFrameIndex++;
+
+            if (animationFrameIndex >=
+                static_cast<int>(currentAnimationFrames.size()))
+            {
+                if (animationLooping)
+                {
+                    animationFrameIndex = 0;
+                }
+                else
+                {
+                    animationFrameIndex =
+                        static_cast<int>(currentAnimationFrames.size()) - 1;
+
+                    if (animationEndHoldCounter < animationEndHoldFrames)
+                    {
+                        animationEndHoldCounter++;
+                    }
+                    else
+                    {
+                        animationPlaying = false;
+                    }
+                }
+            }
         }
 
-        if (modernAttackFrame >= modernAttackFrameCount)
+        if (!currentAnimationFrames.empty())
         {
-            modernAttackAnimationActive = false;
-            modernAttackFrame = 0;
-            modernAttackHoldCounter = 0;
+            const AnimationFrame& frame =
+                currentAnimationFrames[animationFrameIndex];
+
+            updateModernSpriteFrame(
+                frame.row,
+                frame.column
+            );
         }
-        else
-        {
-            updateModernSpriteFrame(modernAttackRow,
-                                    modernAttackFrame);
-            return;
-        }
+
+        return;
     }
 
-    bool isMoving =
+    bool moving =
         modernMovementHintActive
             ? modernMovementHintMoving
-            : std::abs(velocityX) > 0.3;
+            : (movingLeft || movingRight);
 
-    if (isMoving)
+    if (!modernMovementHintActive)
     {
-        if (modernCurrentFrame >= modernWalkFrameCount)
+        if (movingLeft && !movingRight)
+        {
+            modernFacingRight = false;
+        }
+        else if (movingRight && !movingLeft)
+        {
+            modernFacingRight = true;
+        }
+        else if (velocityX < -0.3)
+        {
+            modernFacingRight = false;
+        }
+        else if (velocityX > 0.3)
+        {
+            modernFacingRight = true;
+        }
+    }
+
+    modernAnimationCounter++;
+
+    bool facingRight =
+        modernMovementHintActive
+            ? modernMovementHintFacingRight
+            : modernFacingRight;
+
+    if (modernMovementHintActive)
+    {
+        modernFacingRight = facingRight;
+    }
+
+    int row =
+        moving
+            ? modernWalkRow
+            : modernIdleRow;
+
+    int frameCount =
+        moving
+            ? modernWalkFrameCount
+            : modernIdleFrameCount;
+
+    int speed =
+        moving
+            ? 5
+            : 12;
+
+    if (modernAnimationCounter >= speed)
+    {
+        modernAnimationCounter = 0;
+
+        modernCurrentFrame++;
+
+        if (modernCurrentFrame >= frameCount)
         {
             modernCurrentFrame = 0;
         }
-
-        modernAnimationCounter++;
-
-        if (modernAnimationCounter >= 6)
-        {
-            modernCurrentFrame++;
-
-            if (modernCurrentFrame >= modernWalkFrameCount)
-            {
-                modernCurrentFrame = 0;
-            }
-
-            modernAnimationCounter = 0;
-        }
-
-        updateModernSpriteFrame(modernWalkRow,
-                                modernCurrentFrame);
     }
-    else
+
+    int displayColumn = modernCurrentFrame;
+
+    if (!facingRight)
     {
-        if (modernCurrentFrame >= modernIdleFrameCount)
-        {
-            modernCurrentFrame = 0;
-        }
-
-        modernAnimationCounter++;
-
-        if (modernAnimationCounter >= 12)
-        {
-            modernCurrentFrame++;
-
-            if (modernCurrentFrame >= modernIdleFrameCount)
-            {
-                modernCurrentFrame = 0;
-            }
-
-            modernAnimationCounter = 0;
-        }
-
-        updateModernSpriteFrame(modernIdleRow,
-                                modernCurrentFrame);
+        displayColumn =
+            (frameCount - 1) - modernCurrentFrame;
     }
+
+    updateModernSpriteFrame(
+        row,
+        displayColumn
+    );
 }
 
 int Character::attack()
@@ -931,6 +1046,8 @@ void Character::resetForLevel()
     modernAttackFrame = 0;
     modernAttackHoldCounter = 0;
     modernAttackFrameDelay = modernAttackSlowFrameDelay;
+    animationEndHoldFrames = 0;
+    animationEndHoldCounter = 0;
     modernFacingRight = true;
     modernSpriteGroundOffset = 0.0;
     modernMovementHintActive = false;

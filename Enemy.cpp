@@ -5,13 +5,17 @@
 #include <QGraphicsScene>
 #include <QBrush>
 #include <QPen>
+#include <algorithm>
 
-Enemy::Enemy(string name)
+Enemy::Enemy(string name,
+             const QString &spritePath,
+             int formationIndex)
     : Character(name, 30, 100),
-    attackCoolDown(0)
+    attackCoolDown(0),
+    formationIndex(formationIndex)
 {
     setModernSpriteSheet(
-        ":/sprites/minotaur_earth.png",
+        spritePath,
         96,
         96,
         0,
@@ -24,18 +28,19 @@ Enemy::Enemy(string name)
         5
     );
 
-    setModernSpriteTargetSize(QSize(330, 330));
-    setModernSpriteGroundOffset(83.0);
+    setModernSpriteTargetSize(QSize(200, 200));
+    setModernSpriteGroundOffset(48.0);
     setBrush(Qt::NoBrush);
     setPen(Qt::NoPen);
+    setZValue(5);
 
     healthBarBack = new QGraphicsRectItem(this);
-    healthBarBack->setRect(0, -66, 100, 7);
+    healthBarBack->setRect(0, -42, 70, 7);
     healthBarBack->setBrush(QBrush(Qt::darkGray));
     healthBarBack->setPen(QPen(Qt::black));
 
     healthBarFill = new QGraphicsRectItem(this);
-    healthBarFill->setRect(0, -66, 100, 7);
+    healthBarFill->setRect(0, -42, 70, 7);
     healthBarFill->setBrush(QBrush(Qt::green));
     healthBarFill->setPen(Qt::NoPen);
 }
@@ -59,7 +64,7 @@ void Enemy::updateLocation(Character &player)
         break;
 
     case State::Telegraph:
-        handleTelegraph();
+        handleTelegraph(player);
         break;
 
     case State::Attack:
@@ -77,11 +82,13 @@ void Enemy::updateLocation(Character &player)
         break;
     }
 
+    separateFromOtherEnemies();
+
     bool movedHorizontally =
         std::abs(x() - previousX) > 0.01;
 
     bool facingRight =
-        player.x() >= x();
+        shouldFaceRight(player);
 
     setAnimationMovementHint(movedHorizontally,
                              facingRight);
@@ -93,15 +100,21 @@ void Enemy::updateLocation(Character &player)
 
 void Enemy::handleChase(Character &player)
 {
-    float dx = player.x() - x();
+    float enemyCenterX =
+        x() + rect().width() / 2.0;
+
+    float targetCenterX =
+        targetAttackCenterX(player);
+
+    float dx = targetCenterX - enemyCenterX;
     float dy = player.y() - y();
 
-    float dis = sqrt(pow(dy, 2) + pow(dx, 2));
+    float stoppingDistance = 6.0f;
 
-    if (dx > 5) {
+    if (dx > stoppingDistance) {
         moveBy(speed, 0);
     }
-    else if (dx < -5) {
+    else if (dx < -stoppingDistance) {
         moveBy(-speed, 0);
     }
 
@@ -117,17 +130,21 @@ void Enemy::handleChase(Character &player)
         return;
     }
 
-    if (dis < 70) {
+    if (canAttackPlayer(player)) {
         currentState = State::Telegraph;
         telegraphTimer = 30;
     }
 }
 
-void Enemy::handleTelegraph()
+void Enemy::handleTelegraph(Character &player)
 {
+    Q_UNUSED(player);
+
     telegraphTimer--;
 
     if (telegraphTimer <= 0) {
+        attackTimer = 0;
+        attackDamageApplied = false;
         currentState = State::Attack;
     }
 }
@@ -139,34 +156,124 @@ void Enemy::attack(Character &player)
         return;
     }
 
-    playModernAttackAnimation(player.x() >= x());
+    const int attackFrameDelay = 5;
+    const int damageFrameTick = attackFrameDelay * 3;
+    const int attackFinishTick = attackFrameDelay * 5 + 6;
 
-    auto dy = std::abs(this->y() - player.y());
-    auto dx = std::abs(this->x() - player.x());
+    if (attackTimer == 0) {
+        const double enemyCenterX =
+            x() + rect().width() / 2.0;
 
-    if (dx < 70 && dy < 60) {
-        player.registerHit(getAttackDamage());
+        const double playerCenterY =
+            player.y() + player.rect().height() / 2.0;
 
-        float knockDir = (player.x() > x()) ? 20.0f : -20.0f;
+        setFacingFromTarget(
+            QPointF(enemyCenterX + (shouldFaceRight(player) ? 100.0 : -100.0),
+                    playerCenterY)
+        );
 
-        player.setX(player.x() + knockDir);
-        player.setY(player.y() - 5);
-
-        if (player.scene()) {
-            QRectF sceneRect = player.scene()->sceneRect();
-
-            if (player.x() < sceneRect.left()) {
-                player.setX(sceneRect.left());
-            }
-
-            if (player.x() + player.rect().width() > sceneRect.right()) {
-                player.setX(sceneRect.right() - player.rect().width());
-            }
-        }
+        playAnimationSequence(
+            {
+                AnimationFrame(2, 0),
+                AnimationFrame(2, 1),
+                AnimationFrame(2, 2),
+                AnimationFrame(2, 3),
+                AnimationFrame(2, 4)
+            },
+            false,
+            attackFrameDelay,
+            4
+        );
     }
 
-    cooldownTimer = 60;
-    currentState = State::CoolDown;
+    attackTimer++;
+
+    if (!attackDamageApplied &&
+        attackTimer >= damageFrameTick) {
+        applyAttackDamage(player);
+        attackDamageApplied = true;
+    }
+
+    if (attackTimer >= attackFinishTick) {
+        attackTimer = 0;
+        attackDamageApplied = false;
+        cooldownTimer = 60;
+        currentState = State::CoolDown;
+    }
+}
+
+bool Enemy::canAttackPlayer(Character &player) const
+{
+    auto enemyCenterX =
+        x() + rect().width() / 2.0;
+
+    auto playerCenterX =
+        player.x() + player.rect().width() / 2.0;
+
+    auto dy = std::abs(this->y() - player.y());
+    auto dx = std::abs(enemyCenterX - playerCenterX);
+
+    double attackCenterGap =
+        (rect().width() + player.rect().width()) / 2.0 + 35.0;
+
+    return dx < attackCenterGap && dy < 75;
+}
+
+double Enemy::targetAttackCenterX(Character &player) const
+{
+    const double enemyCenterX =
+        x() + rect().width() / 2.0;
+
+    const double playerCenterX =
+        player.x() + player.rect().width() / 2.0;
+
+    const double attackSide =
+        enemyCenterX < playerCenterX ? -1.0 : 1.0;
+
+    const double baseGap =
+        (rect().width() + player.rect().width()) / 2.0 + 18.0;
+
+    const double spacingOffset =
+        (formationIndex % 3) * 10.0;
+
+    return playerCenterX + attackSide * (baseGap + spacingOffset);
+}
+
+bool Enemy::shouldFaceRight(Character &player) const
+{
+    const double enemyCenterX =
+        x() + rect().width() / 2.0;
+
+    const double playerCenterX =
+        player.x() + player.rect().width() / 2.0;
+
+    return playerCenterX >= enemyCenterX;
+}
+
+void Enemy::applyAttackDamage(Character &player)
+{
+    if (!canAttackPlayer(player)) {
+        return;
+    }
+
+    player.registerHit(getAttackDamage());
+
+    float knockDir = (player.x() > x()) ? 20.0f : -20.0f;
+
+    player.setX(player.x() + knockDir);
+    player.setY(player.y() - 5);
+
+    if (player.scene()) {
+        QRectF sceneRect = player.scene()->sceneRect();
+
+        if (player.x() < sceneRect.left()) {
+            player.setX(sceneRect.left());
+        }
+
+        if (player.x() + player.rect().width() > sceneRect.right()) {
+            player.setX(sceneRect.right() - player.rect().width());
+        }
+    }
 }
 
 void Enemy::handleCooldown()
@@ -248,6 +355,60 @@ void Enemy::handleGravity()
     }
 }
 
+void Enemy::separateFromOtherEnemies()
+{
+    if (!scene()) {
+        return;
+    }
+
+    const QRectF myRect = sceneBoundingRect();
+    const double myCenterX = myRect.center().x();
+    const double myCenterY = myRect.center().y();
+    const double minimumCenterGap = rect().width() + 18.0;
+
+    for (QGraphicsItem *item : scene()->items()) {
+        Enemy *other = dynamic_cast<Enemy*>(item);
+
+        if (!other || other == this || !other->isAlive()) {
+            continue;
+        }
+
+        const QRectF otherRect = other->sceneBoundingRect();
+
+        if (!myRect.intersects(otherRect)) {
+            continue;
+        }
+
+        const double otherCenterX = otherRect.center().x();
+        const double otherCenterY = otherRect.center().y();
+
+        if (std::abs(myCenterY - otherCenterY) > rect().height()) {
+            continue;
+        }
+
+        const double dx = myCenterX - otherCenterX;
+        const double overlap = minimumCenterGap - std::abs(dx);
+
+        if (overlap <= 0.0) {
+            continue;
+        }
+
+        const double direction =
+            dx < 0.0 ? -1.0 :
+            dx > 0.0 ? 1.0 :
+            this < other ? -1.0 : 1.0;
+
+        setX(x() + direction * (overlap / 2.0 + 1.0));
+
+        if (scene()) {
+            const QRectF sceneRect = scene()->sceneRect();
+            const double minX = sceneRect.left();
+            const double maxX = sceneRect.right() - rect().width();
+            setX(std::clamp(x(), minX, maxX));
+        }
+    }
+}
+
 void Enemy::updateHealthBar()
 {
     if (!healthBarBack || !healthBarFill) {
@@ -277,10 +438,10 @@ void Enemy::updateHealthBar()
         healthPercent = 1.0;
     }
 
-    double barWidth = 100.0 * healthPercent;
+    double barWidth = 70.0 * healthPercent;
 
-    healthBarBack->setRect(0, -66, 100, 7);
-    healthBarFill->setRect(0, -66, barWidth, 7);
+    healthBarBack->setRect(0, -42, 70, 7);
+    healthBarFill->setRect(0, -42, barWidth, 7);
 }
 
 void Enemy::resetEnemyState()
@@ -293,9 +454,12 @@ void Enemy::resetEnemyState()
     telegraphTimer = 0;
     cooldownTimer = 0;
     jumpCooldown = 0;
+    attackTimer = 0;
+    attackDamageApplied = false;
 
     setBrush(Qt::NoBrush);
     setPen(Qt::NoPen);
+    setZValue(5);
 
     show();
 

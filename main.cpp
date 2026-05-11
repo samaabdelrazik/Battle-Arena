@@ -35,6 +35,8 @@ private:
 
     bool mouseHeld = false;
     int normalShootCounter = 0;
+    int warriorHoldCounter = 0;
+    bool warriorHoldAttacking = false;
 
 public:
     ShootingFilter(Character *player, QGraphicsView *view)
@@ -64,22 +66,134 @@ public:
 
     void updateNormalShooting()
     {
-        if (!mouseHeld || !player || !player->isAlive())
+        bool leftButtonDown =
+            QApplication::mouseButtons() & Qt::LeftButton;
+
+        if (leftButtonDown && !mouseHeld)
         {
-            return;
+            mouseHeld = true;
+            normalShootCounter =
+                player ? player->getAttackCooldownFrames() : 0;
+
+            warriorHoldCounter = 8;
+            warriorHoldAttacking = false;
+
+            if (player)
+            {
+                view->setFocus();
+                view->viewport()->setFocus();
+                player->setFocus();
+            }
+        }
+        else if (!leftButtonDown && mouseHeld)
+        {
+            mouseHeld = false;
+            normalShootCounter = 0;
+            warriorHoldCounter = 0;
+            warriorHoldAttacking = false;
+
+            if (Archer *archer =
+                    dynamic_cast<Archer*>(player))
+            {
+                archer->stopRapidFire();
+            }
+
+            if (Warrior *warrior =
+                    dynamic_cast<Warrior*>(player))
+            {
+                warrior->stopRapidAttack();
+            }
+
+            if (Mage *mage =
+                    dynamic_cast<Mage*>(player))
+            {
+                mage->stopRapidAttack();
+            }
         }
 
-        if (player->isSpecialActive() &&
-            dynamic_cast<Mage*>(player))
+        if (!mouseHeld || !player || !player->isAlive())
         {
             return;
         }
 
         normalShootCounter++;
 
+        if (Warrior *warrior =
+                dynamic_cast<Warrior*>(player))
+        {
+            warriorHoldCounter++;
+
+            if (warriorHoldCounter >= 8)
+            {
+                QPoint mousePos =
+                    view->mapFromGlobal(QCursor::pos());
+
+                QPointF scenePos =
+                    view->mapToScene(mousePos);
+
+                if (warrior->isSpecialActive())
+                {
+                    warrior->basicAttack(scenePos);
+                }
+                else
+                {
+                    warrior->rapidAttack(scenePos);
+                }
+
+                warriorHoldAttacking = true;
+            }
+
+            return;
+        }
+
         if (normalShootCounter >= player->getAttackCooldownFrames())
         {
-            shootAttack();
+            Archer *archer =
+                dynamic_cast<Archer*>(player);
+
+            if (archer && !archer->isSpecialActive())
+            {
+                QPoint mousePos =
+                    view->mapFromGlobal(QCursor::pos());
+
+                QPointF scenePos =
+                    view->mapToScene(mousePos);
+
+                archer->rapidAttack(scenePos);
+            }
+            else if (Warrior *warrior =
+                         dynamic_cast<Warrior*>(player))
+            {
+                QPoint mousePos =
+                    view->mapFromGlobal(QCursor::pos());
+
+                QPointF scenePos =
+                    view->mapToScene(mousePos);
+
+                warrior->rapidAttack(scenePos);
+            }
+            else
+            {
+                if (Mage *mage =
+                        dynamic_cast<Mage*>(player))
+                {
+                    if (!mage->isSpecialActive())
+                    {
+                        QPoint mousePos =
+                            view->mapFromGlobal(QCursor::pos());
+
+                        QPointF scenePos =
+                            view->mapToScene(mousePos);
+
+                        mage->rapidAttack(scenePos);
+                    }
+                }
+                else
+                {
+                    shootAttack();
+                }
+            }
+
             normalShootCounter = 0;
         }
     }
@@ -98,12 +212,16 @@ protected:
             {
                 mouseHeld = true;
 
-                shootAttack();
+                normalShootCounter =
+                    player ? player->getAttackCooldownFrames() : 0;
 
-                normalShootCounter = 0;
+                warriorHoldCounter = 8;
+                warriorHoldAttacking = false;
 
                 if (player)
                 {
+                    view->setFocus();
+                    view->viewport()->setFocus();
                     player->setFocus();
                 }
 
@@ -120,6 +238,35 @@ protected:
             {
                 mouseHeld = false;
                 normalShootCounter = 0;
+                warriorHoldCounter = 0;
+                warriorHoldAttacking = false;
+
+                view->setFocus();
+                view->viewport()->setFocus();
+
+                Archer *archer =
+                    dynamic_cast<Archer*>(player);
+
+                if (archer)
+                {
+                    archer->stopRapidFire();
+                }
+
+                Warrior *warrior =
+                    dynamic_cast<Warrior*>(player);
+
+                if (warrior)
+                {
+                    warrior->stopRapidAttack();
+                }
+
+                Mage *mage =
+                    dynamic_cast<Mage*>(player);
+
+                if (mage)
+                {
+                    mage->stopRapidAttack();
+                }
 
                 return true;
             }
@@ -138,7 +285,36 @@ protected:
                         player->canUseSpecial() &&
                         !player->isSpecialActive())
                     {
-                        player->startSpecial();
+                        Archer *archer =
+                            dynamic_cast<Archer*>(player);
+
+                        if (archer)
+                        {
+                            archer->specialAbility();
+                        }
+                        else if (Warrior *warrior =
+                                     dynamic_cast<Warrior*>(player))
+                        {
+                            QPoint mousePos =
+                                view->mapFromGlobal(QCursor::pos());
+
+                            QPointF scenePos =
+                                view->mapToScene(mousePos);
+
+                            warrior->stopRapidAttack();
+                            warrior->startSpecial();
+                            warrior->basicAttack(scenePos);
+                        }
+                        else
+                        {
+                            if (Mage *mage =
+                                    dynamic_cast<Mage*>(player))
+                            {
+                                mage->stopRapidAttack();
+                            }
+
+                            player->startSpecial();
+                        }
                     }
                 }
 
@@ -300,6 +476,7 @@ int main(int argc, char *argv[])
         player->setRect(0, 0, 50, 50);
         player->setPos(100, 600);
         player->setFlag(QGraphicsItem::ItemIsFocusable);
+        player->setZValue(20);
 
         scene->addItem(player);
         player->setFocus();
@@ -312,17 +489,27 @@ int main(int argc, char *argv[])
             return;
         }
 
-        Enemy *enemy = new Enemy("enemy");
-        enemy->setRect(0, 0, 100, 100);
+        QString enemySprites[4] = {
+            ":/sprites/minotaur_earth.png",
+            ":/sprites/minotaur_frost.png",
+            ":/sprites/minotaur_lava.png",
+            ":/sprites/minotaur_lightning.png"
+        };
+
+        Enemy *enemy =
+            new Enemy("enemy",
+                      enemySprites[totalEnemiesSpawned % 4],
+                      totalEnemiesSpawned);
+        enemy->setRect(0, 0, 70, 70);
 
         int slot = activeEnemies.size();
 
         double spawnYPositions[5] = {
-            550,
-            550,
-            420,
-            320,
-            220
+            580,
+            580,
+            450,
+            350,
+            250
         };
 
         double spawnY =
@@ -415,6 +602,7 @@ int main(int argc, char *argv[])
 
         if (filter)
         {
+            a.removeEventFilter(filter);
             view->removeEventFilter(filter);
             view->viewport()->removeEventFilter(filter);
 
@@ -424,6 +612,7 @@ int main(int argc, char *argv[])
 
         filter = new ShootingFilter(player, view);
 
+        a.installEventFilter(filter);
         view->installEventFilter(filter);
         view->viewport()->installEventFilter(filter);
 
@@ -579,6 +768,7 @@ int main(int argc, char *argv[])
             if (archerPlayer->getSpecialBar() <= 0)
             {
                 archerPlayer->stopSpecial();
+                archerPlayer->stopAnimationSequence();
                 archerSpecialFireCounter = 0;
             }
             else if (archerSpecialFireCounter >= 7)
