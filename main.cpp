@@ -18,6 +18,7 @@
 #include <QPushButton>
 #include <functional>
 #include <QRandomGenerator>
+#include <QProgressBar>
 
 #include "Character.h"
 #include "Archer.h"
@@ -411,19 +412,19 @@ int main(int argc, char *argv[])
         new QGraphicsTextItem("Special: 0%");
     specialText->setDefaultTextColor(Qt::white);
     specialText->setFont(QFont("Arial", 14, QFont::Bold));
-    specialText->setPos(20, 15);
+    specialText->setPos(20, 100);
     specialText->setZValue(1000);
     scene->addItem(specialText);
 
     QGraphicsRectItem *specialBarBack =
-        new QGraphicsRectItem(20, 45, 220, 20);
+        new QGraphicsRectItem(20, 125, 220, 20);
     specialBarBack->setBrush(QBrush(Qt::darkGray));
     specialBarBack->setPen(QPen(Qt::white, 2));
     specialBarBack->setZValue(1000);
     scene->addItem(specialBarBack);
 
     QGraphicsRectItem *specialBarFill =
-        new QGraphicsRectItem(22, 47, 0, 16);
+        new QGraphicsRectItem(22, 127, 0, 16);
     specialBarFill->setBrush(QBrush(Qt::green));
     specialBarFill->setPen(Qt::NoPen);
     specialBarFill->setZValue(1001);
@@ -433,7 +434,7 @@ int main(int argc, char *argv[])
         new QGraphicsTextItem("");
     specialStatusText->setDefaultTextColor(Qt::yellow);
     specialStatusText->setFont(QFont("Arial", 12, QFont::Bold));
-    specialStatusText->setPos(20, 70);
+    specialStatusText->setPos(20, 150);
     specialStatusText->setZValue(1000);
     scene->addItem(specialStatusText);
 
@@ -758,6 +759,68 @@ int main(int argc, char *argv[])
             player->setFocus();
         };
 
+    // health and score bars
+    QProgressBar *healthBar = new QProgressBar(view);
+    QProgressBar *scoreBar = new QProgressBar(view);
+
+    healthBar->setGeometry(20, 20, 250, 30);
+    scoreBar->setGeometry(20, 60, 250, 30);
+
+    healthBar->setRange(0, 100);
+    healthBar->setValue(100);
+
+    scoreBar->setRange(0, 500);
+    scoreBar->setValue(0);
+
+    healthBar->setFormat("Health: %v");
+    scoreBar->setFormat("Score: %v");
+
+    healthBar->setStyleSheet(
+        "QProgressBar {"
+        "border: 2px solid white;"
+        "border-radius: 5px;"
+        "text-align: center;"
+        "font-weight: bold;"
+        "background-color: black;"
+        "color: white;"
+        "}"
+        "QProgressBar::chunk {"
+        "background-color: red;"
+        "}"
+        );
+
+    scoreBar->setStyleSheet(
+        "QProgressBar {"
+        "border: 2px solid white;"
+        "border-radius: 5px;"
+        "text-align: center;"
+        "font-weight: bold;"
+        "background-color: black;"
+        "color: white;"
+        "}"
+        "QProgressBar::chunk {"
+        "background-color: green;"
+        "}"
+        );
+// special
+    healthBar->show();
+    scoreBar->show();
+
+    QTimer *bartimer = new QTimer();
+
+    QObject::connect(bartimer, &QTimer::timeout, [&]() {
+        if(player)
+        {
+            healthBar->setValue(player->getHealth());
+
+            scoreBar->setValue(player->getScore());
+        }
+    });
+
+    bartimer->start(16);
+
+// end of health and score parts
+
     QObject::connect(timer,
                      &QTimer::timeout,
                      [&]() {
@@ -877,7 +940,7 @@ int main(int argc, char *argv[])
                          double barWidth =
                              216.0 * (specialPercent / 100.0);
 
-                         specialBarFill->setRect(22, 47, barWidth, 16);
+                         specialBarFill->setRect(22, 127, barWidth, 16);
 
                          specialText->setPlainText(
                              "Special: " +
