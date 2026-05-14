@@ -58,6 +58,7 @@ qt_add_executable(Battle_Arena
     CharacterSelect.h
     CharacterSelect.cpp
     CharacterSelect.ui
+    ShootingFilter.cpp
 )
 
 target_link_libraries(Battle_Arena
