@@ -10,5 +10,10 @@
         <file alias="minotaur_lava.png">Effects/minotaur_spritesheets/minotaurus_spritesheet_lava.png</file>
         <file alias="minotaur_lightning.png">Effects/minotaur_spritesheets/minotaurus_spritesheet_lightning.png</file>
     </qresource>
+    <qresource prefix="/backgrounds">
+        <file alias="game_background_1.png">Effects/PNG/game_background_1/game_background_1.png</file>
+        <file alias="game_background_2.png">Effects/PNG/game_background_2/game_background_2.png</file>
+        <file alias="game_background_3.png">Effects/PNG/game_background_3/game_background_3.png</file>
+        <file alias="game_background_4.png">Effects/PNG/game_background_4/game_background_4.png</file>
+    </qresource>
 </RCC>
-

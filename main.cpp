@@ -15,7 +15,9 @@
 #include <QBrush>
 #include <QPen>
 #include <QFont>
+#include <QPixmap>
 #include <QPushButton>
+#include <QString>
 #include <functional>
 #include <QRandomGenerator>
 #include <QProgressBar>
@@ -59,6 +61,33 @@ int main(int argc, char *argv[])
     const int LEVEL_ENEMY_COUNTS[3] = {20, 30, 40};
     const int MAX_LEVELS = 3;
     const int MAX_ACTIVE_ENEMIES = 5;
+    const QString BACKGROUND_PATHS[3] = {
+        ":/backgrounds/game_background_1.png",
+        ":/backgrounds/game_background_2.png",
+        ":/backgrounds/game_background_3.png"
+    };
+
+    auto updateArenaBackground = [&]() {
+        int backgroundIndex = currentLevel - 1;
+
+        if (backgroundIndex < 0)
+        {
+            backgroundIndex = 0;
+        }
+        else if (backgroundIndex >= MAX_LEVELS)
+        {
+            backgroundIndex = MAX_LEVELS - 1;
+        }
+
+        scene->setBackgroundBrush(QBrush(
+            QPixmap(BACKGROUND_PATHS[backgroundIndex])
+                .scaled(1000,
+                        700,
+                        Qt::IgnoreAspectRatio,
+                        Qt::SmoothTransformation)));
+    };
+
+    updateArenaBackground();
 
     Platform *ground = new Platform(0, 650, 1000, 50);
     Platform *platform1 = new Platform(180, 520, 180, 20);
@@ -434,6 +463,7 @@ int main(int argc, char *argv[])
     restartLevel = [&]() {
         clearArrowsAndBlocks();
         clearEnemies();
+        updateArenaBackground();
 
         totalEnemiesSpawned = 0;
         totalEnemiesKilled = 0;
