@@ -7,6 +7,7 @@ class Platform : public QGraphicsRectItem
 {
 public:
     Platform(qreal x, qreal y, qreal width, qreal height);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };
 
 #endif
